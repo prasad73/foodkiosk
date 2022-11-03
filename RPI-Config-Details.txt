@@ -1,0 +1,5 @@
+RPI-Master-USB Port: /dev/ttyUSB0
+RPI-Master-USB Port: /dev/ttyUSB1
+
+ls /dev/tty*
+

@@ -1,0 +1,13 @@
+{
+    "LockerID" : "Versicles_L1",
+    "boxes" :[
+        {
+            "id" : 1,
+            "Status" : 0
+        },
+        {
+            "id" : 2,
+            "Status" : 1
+        }
+    ]
+}
