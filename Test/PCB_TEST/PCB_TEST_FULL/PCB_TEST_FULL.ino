@@ -122,32 +122,44 @@ void loop(){
 */
 
 
-		{ R1_STATE = !R1_STATE; digitalWrite(R1, R1_STATE);R2_STATE = !R2_STATE; digitalWrite(R2, R2_STATE);R3_STATE = !R3_STATE; digitalWrite(R3, R3_STATE);}
-		delay(3000);
-		TurnoffAllLed();
-		delay(2000);
-		{ G1_STATE = !G1_STATE; digitalWrite(G1, G1_STATE);G2_STATE = !G2_STATE; digitalWrite(G2, G2_STATE);G3_STATE = !G3_STATE; digitalWrite(G3, G3_STATE);}
-		delay(3000);
-		TurnoffAllLed();
-		delay(2000);
-		{ B1_STATE = !B1_STATE; digitalWrite(B1, B1_STATE); B2_STATE = !B2_STATE; digitalWrite(B2, B2_STATE); B3_STATE = !B3_STATE; digitalWrite(B3, B3_STATE);}
-		delay(3000);
+		// { R1_STATE = !R1_STATE; digitalWrite(R1, R1_STATE);R2_STATE = !R2_STATE; digitalWrite(R2, R2_STATE);R3_STATE = !R3_STATE; digitalWrite(R3, R3_STATE);}
+		// delay(3000);
+		// TurnoffAllLed();
+		// delay(2000);
+		// { G1_STATE = !G1_STATE; digitalWrite(G1, G1_STATE);G2_STATE = !G2_STATE; digitalWrite(G2, G2_STATE);G3_STATE = !G3_STATE; digitalWrite(G3, G3_STATE);}
+		// delay(3000);
+		// TurnoffAllLed();
+		// delay(2000);
+		// { B1_STATE = !B1_STATE; digitalWrite(B1, B1_STATE); B2_STATE = !B2_STATE; digitalWrite(B2, B2_STATE); B3_STATE = !B3_STATE; digitalWrite(B3, B3_STATE);}
+		// delay(3000);
+		{ 
+			B1_STATE = !B1_STATE; digitalWrite(B1, B1_STATE);
+			G1_STATE = !G1_STATE; digitalWrite(G1, G1_STATE);
+
+			B2_STATE = !B2_STATE; digitalWrite(B2, B2_STATE);
+			G2_STATE = !G2_STATE; digitalWrite(G2, G2_STATE);
+
+			B3_STATE = !B3_STATE; digitalWrite(B3, R3_STATE);
+			G3_STATE = !G3_STATE; digitalWrite(G3, G3_STATE);
+		}
+		delay(1500);	
 		TurnoffAllLed();
 		delay(2000);
 		{
 				digitalWrite(Lock1 , HIGH);
-				digitalWrite(Lock2 , HIGH);
-				digitalWrite(Lock3 , HIGH);
-				delay(200);
+				// digitalWrite(Lock2 , HIGH);
+				// digitalWrite(Lock3 , HIGH);
+				delay(1500);
 				digitalWrite(Lock1 , LOW);
-				digitalWrite(Lock2 , LOW);
-				digitalWrite(Lock3 , LOW);
+				// digitalWrite(Lock2 , LOW);
+				// digitalWrite(Lock3 , LOW);
 
 		}
-		TurnonAllLed();
-		delay(2000);
-		TurnoffAllLed();
-		delay(1000);
+		// TurnonAllLed();
+		// delay(2000);
+		// TurnoffAllLed();
+		// delay(1000);
+		delay(10000);
 	
 }
 

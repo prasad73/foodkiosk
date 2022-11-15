@@ -1,7 +1,12 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #define INPUT_SIZE 19
+#define R1 21
+#define G1 19
+#define B1 18
+
 String String_data="1:1&0:0&1:0&1:1&0:0"; //"1:1:0:0:1:0:1:1:0:0";
+
 
 // REPLACE WITH YOUR ESP RECEIVER'S MAC ADDRESS
 uint8_t broadcastAddress1[] = {0xC8, 0xF0, 0x9E, 0x9F, 0x50, 0x5C};
@@ -18,6 +23,7 @@ typedef struct test_struct {
   int green2;
   int lock3;
   int green3;
+
 } test_struct;
 
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
@@ -32,6 +38,14 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
  
 void setup() {
+
+  pinMode(R1, OUTPUT);
+  pinMode(G1, OUTPUT);
+  pinMode(B1, OUTPUT);
+
+  // digitalWrite(R1, LOW);
+  digitalWrite(G1, 1);
+  digitalWrite(B1, 1);
  
   Serial.begin(115200);
   Serial.setTimeout(3000);
@@ -208,7 +222,7 @@ void loop() {
   else{
     Box369.lock3 = 0;
     Box369.green3 = 0;   
-  }    
+  } 
 //------------------------------------------------------ 
   esp_err_t result1 = esp_now_send(
     broadcastAddress1, 

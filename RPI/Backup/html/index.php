@@ -128,12 +128,12 @@ If (isset($_GET['action'])){
 	} else {
 		$action = $_GET['action'];
 		$pin = mysqli_real_escape_string($dbConnection, $_GET['pin']);
-		if ($action == "turnOn"){
+		if ($action == "turnOff"){
 			$setting = "1";
 			mysqli_query($dbConnection, "UPDATE BoxStatus SET BoxStatus='$setting' WHERE BoxNumber='$pin';");
 			$dbConnection -> close();
 			header('Location: index.php');
-		} else if ($action == "turnOff"){
+		} else if ($action == "turnOn"){
 			$setting = "0";
 			mysqli_query($dbConnection, "UPDATE BoxStatus SET BoxStatus='$setting' WHERE BoxNumber='$pin';");
 			$dbConnection -> close();
@@ -210,7 +210,7 @@ If (isset($_GET['action'])){
 			$Box = $BoxRow['BoxNumber'];
 			$BoxState = $BoxRow['BoxStatus'];
 			$Orderno = $OrderRow['OrderNumber'];
-			If ($BoxState == "0"){
+			If ($BoxState == "1"){
 				$buttonValue = "Open";
 				$action = "turnOn";
 				$image = "on.jpg";

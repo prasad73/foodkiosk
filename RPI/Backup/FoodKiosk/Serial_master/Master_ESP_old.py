@@ -5,19 +5,7 @@ import MySQLdb
 import time
 # import sys
 
-# import urllib library
-from urllib.request import urlopen
-  
-# import json
-import json
-
-# box_status="1:0:1:0:1:0:0:0:0:0:&"
-
-url = "https://locker-api.versicles.com/locker/locker@mot.json"
-response = urlopen(url)
-  
-# storing the JSON response 
-data_json = json.loads(response.read())
+# box_status="1:0:1:0:1:0:0:0:0:0"
 
 # Open database connection
 db = MySQLdb.connect("localhost","admin","vs12345","Vendigo_S1" )
@@ -43,21 +31,18 @@ def process_db():
             index += 1
          for i in range (0,10):
             if status[i] == ['0']:
-               boxstatus += "0:"
                # print("Box: " + str(i+1) + " Free")
-               # if i != 9:
-               #    boxstatus += "0:"
-               # else:
-               #    boxstatus += "0"
+               if i != 9:
+                  boxstatus += "0:"
+               else:
+                  boxstatus += "0"
             else:
-               boxstatus += "1:"
                # print("Box: " + str(i+1) + " Occupied")
-               # if i != 9:
-               #    boxstatus += "1:"
-               # else:
-               #    boxstatus += "1"
+               if i != 9:
+                  boxstatus += "1:"
+               else:
+                  boxstatus += "1"
          boxstatus.strip()
-         boxstatus+='&'
                
          print("boxstatus_command = " + boxstatus)
          ser.write(bytes(boxstatus, 'utf-8'))
@@ -77,15 +62,17 @@ def process_db():
 
 if __name__ == '__main__':
    while True:
-      try:
-         ser = serial.Serial('/dev/ttyACM0', 115200, timeout=2)
-         if ser.isOpen()==True:
-            ser.reset_input_buffer()
-            break
-      except serial.SerialException:
-         print("Connecting with other port")
-         #ser = serial.Serial('/dev/ttyUSB1', 115200, timeout=5)
-
+    try:
+      ser = serial.Serial('/dev/ttyUSB1', 115200, timeout=5)
+      if ser.isOpen()==True:
+         ser.reset_input_buffer()
+         break
+      ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=5)
+      if ser.isOpen()==True:
+         ser.reset_input_buffer()
+         break
+    except serial.SerialException:
+      print("Connecting with other port")
       
    while True:
         process_db()
