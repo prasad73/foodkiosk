@@ -1,26 +1,26 @@
 #include <Adafruit_NeoPixel.h>
-#define LED_PIN  21
-#define LED_COUNT 3
+#define LED_PIN  21 //SCL
+#define LED_COUNT 51
 
-#define Lock1 6
+#define Lock1 12 //6
 #define Lock2 7
-#define Lock3 8
-#define Lock4 9
-#define Lock5 10
-#define Lock6 11
-#define Lock7 12
-#define Lock8 13
-#define Lock9 14
-#define Lock10 15
-#define Lock11 16
-#define Lock12 17
+#define Lock3 16 //8
+#define Lock4 11 //9
+#define Lock5 6 //10
+#define Lock6 14 //11
+#define Lock7 10 //12
+#define Lock8 8 //13
+#define Lock9 15 //14
+#define Lock10 17 //15
+//#define Lock11 16
+//#define Lock12 17
 
 bool R_state = false;
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
-int Locks[] = {Lock1,Lock2,Lock3,Lock4,Lock5,Lock6,Lock7,Lock8,Lock9,Lock10, Lock11, Lock12};
-int No_of_locks = 12;
+int Locks[] = {Lock1,Lock2,Lock3,Lock4,Lock5,Lock6,Lock7,Lock8,Lock9,Lock10};
+int No_of_locks = 10;
 
 void setup(){
 	for(int i=0; i<No_of_locks;i++){
@@ -120,17 +120,17 @@ void loop(){
 				delay(500);
 				digitalWrite(Locks[9] , LOW);
 		}		
-		else if(data == 'B'){
-				digitalWrite(Locks[10] , HIGH);
-				delay(500);
-				digitalWrite(Locks[10] , LOW);
+		// else if(data == 'B'){
+		// 		digitalWrite(Locks[10] , HIGH);
+		// 		delay(500);
+		// 		digitalWrite(Locks[10] , LOW);
 
-		}
-		else if(data == 'C'){
-				digitalWrite(Locks[11] , HIGH);
-				delay(500);
-				digitalWrite(Locks[11] , LOW);
-		}					
+		// }
+		// else if(data == 'C'){
+		// 		digitalWrite(Locks[11] , HIGH);
+		// 		delay(500);
+		// 		digitalWrite(Locks[11] , LOW);
+		// }					
 	}	
 }
 
