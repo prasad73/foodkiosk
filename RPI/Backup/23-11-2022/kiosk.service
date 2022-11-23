@@ -1,0 +1,9 @@
+[Unit]
+Description=Kiosk@MOT
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/verifygntech/Documents/Kiosk/Kiosk.py
+
+[Install]
+WantedBy=multi-user.target
