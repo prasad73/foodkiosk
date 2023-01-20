@@ -1,0 +1,397 @@
+
+(rules PCB MegaController
+  (snap_angle 
+    fortyfive_degree
+  )
+  (autoroute_settings
+    (fanout off)
+    (autoroute on)
+    (postroute on)
+    (vias on)
+    (via_costs 50)
+    (plane_via_costs 5)
+    (start_ripup_costs 100)
+    (start_pass_no 7)
+    (layer_rule "F.Cu"
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 2.6)
+    )
+    (layer_rule "B.Cu"
+      (active on)
+      (preferred_direction vertical)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.6)
+    )
+  )
+  (rule
+    (width 400.0)
+    (clear 300.2)
+    (clear 200.0 (type smd_to_turn_gap))
+    (clear 340.2 (type "default"-"+VDC"))
+    (clear 340.2 (type "default"-"12V"))
+    (clear 340.2 (type "default"-"5v"))
+    (clear 75.0 (type "smd"-"smd"))
+    (clear 340.2 (type "smd"-"+VDC"))
+    (clear 340.2 (type "smd"-"12V"))
+    (clear 340.2 (type "smd"-"5v"))
+    (clear 340.2 (type "kicad_default"-"+VDC"))
+    (clear 340.2 (type "kicad_default"-"12V"))
+    (clear 340.2 (type "kicad_default"-"5v"))
+    (clear 340.2 (type "+VDC"-"+VDC"))
+    (clear 340.2 (type "+VDC"-"12V"))
+    (clear 340.2 (type "+VDC"-"5v"))
+    (clear 340.2 (type "+VDC"-"GND"))
+    (clear 340.2 (type "+VDC"-"Open"))
+    (clear 340.2 (type "+VDC"-"pwm"))
+    (clear 340.2 (type "12V"-"12V"))
+    (clear 340.2 (type "12V"-"5v"))
+    (clear 340.2 (type "12V"-"GND"))
+    (clear 340.2 (type "12V"-"Open"))
+    (clear 340.2 (type "12V"-"pwm"))
+    (clear 340.2 (type "5v"-"5v"))
+    (clear 340.2 (type "5v"-"GND"))
+    (clear 340.2 (type "5v"-"Open"))
+    (clear 340.2 (type "5v"-"pwm"))
+  )
+  (padstack "Via[0-1]_800:450_um"
+    (shape
+      (circle "F.Cu" 800.0 0.0 0.0)
+    )
+    (shape
+      (circle "B.Cu" 800.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (padstack "Via[0-1]_1000:850_um"
+    (shape
+      (circle "F.Cu" 1000.0 0.0 0.0)
+    )
+    (shape
+      (circle "B.Cu" 1000.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (padstack "Via[0-1]_600:480_um"
+    (shape
+      (circle "F.Cu" 600.0 0.0 0.0)
+    )
+    (shape
+      (circle "B.Cu" 600.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (padstack "Via[0-1]_1600:1400_um"
+    (shape
+      (circle "F.Cu" 1600.0 0.0 0.0)
+    )
+    (shape
+      (circle "B.Cu" 1600.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (padstack "Via[0-1]_400:300_um"
+    (shape
+      (circle "F.Cu" 400.0 0.0 0.0)
+    )
+    (shape
+      (circle "B.Cu" 400.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (padstack "Via[0-1]_300:250_um"
+    (shape
+      (circle "F.Cu" 300.0 0.0 0.0)
+    )
+    (shape
+      (circle "B.Cu" 300.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (via 
+    "Via[0-1]_800:450_um" "Via[0-1]_800:450_um" "default"
+  )
+  (via 
+    "Via[0-1]_1000:850_um" "Via[0-1]_1000:850_um" "default"
+  )
+  (via 
+    "Via[0-1]_600:480_um" "Via[0-1]_600:480_um" "default"
+  )
+  (via 
+    "Via[0-1]_1600:1400_um" "Via[0-1]_1600:1400_um" "default"
+  )
+  (via 
+    "Via[0-1]_400:300_um" "Via[0-1]_400:300_um" "default"
+  )
+  (via 
+    "Via[0-1]_300:250_um" "Via[0-1]_300:250_um" "default"
+  )
+  (via 
+    "Via[0-1]_800:450_um-kicad_default" "Via[0-1]_800:450_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_1000:850_um-kicad_default" "Via[0-1]_1000:850_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_600:480_um-kicad_default" "Via[0-1]_600:480_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_1600:1400_um-kicad_default" "Via[0-1]_1600:1400_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_400:300_um-kicad_default" "Via[0-1]_400:300_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_300:250_um-kicad_default" "Via[0-1]_300:250_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_800:450_um-+VDC" "Via[0-1]_800:450_um" "+VDC"
+  )
+  (via 
+    "Via[0-1]_1000:850_um-+VDC" "Via[0-1]_1000:850_um" "+VDC"
+  )
+  (via 
+    "Via[0-1]_600:480_um-+VDC" "Via[0-1]_600:480_um" "+VDC"
+  )
+  (via 
+    "Via[0-1]_1600:1400_um-+VDC" "Via[0-1]_1600:1400_um" "+VDC"
+  )
+  (via 
+    "Via[0-1]_400:300_um-+VDC" "Via[0-1]_400:300_um" "+VDC"
+  )
+  (via 
+    "Via[0-1]_300:250_um-+VDC" "Via[0-1]_300:250_um" "+VDC"
+  )
+  (via 
+    "Via[0-1]_800:450_um-12V" "Via[0-1]_800:450_um" "12V"
+  )
+  (via 
+    "Via[0-1]_1000:850_um-12V" "Via[0-1]_1000:850_um" "12V"
+  )
+  (via 
+    "Via[0-1]_600:480_um-12V" "Via[0-1]_600:480_um" "12V"
+  )
+  (via 
+    "Via[0-1]_1600:1400_um-12V" "Via[0-1]_1600:1400_um" "12V"
+  )
+  (via 
+    "Via[0-1]_400:300_um-12V" "Via[0-1]_400:300_um" "12V"
+  )
+  (via 
+    "Via[0-1]_300:250_um-12V" "Via[0-1]_300:250_um" "12V"
+  )
+  (via 
+    "Via[0-1]_800:450_um-5v" "Via[0-1]_800:450_um" "5v"
+  )
+  (via 
+    "Via[0-1]_1000:850_um-5v" "Via[0-1]_1000:850_um" "5v"
+  )
+  (via 
+    "Via[0-1]_600:480_um-5v" "Via[0-1]_600:480_um" "5v"
+  )
+  (via 
+    "Via[0-1]_1600:1400_um-5v" "Via[0-1]_1600:1400_um" "5v"
+  )
+  (via 
+    "Via[0-1]_400:300_um-5v" "Via[0-1]_400:300_um" "5v"
+  )
+  (via 
+    "Via[0-1]_300:250_um-5v" "Via[0-1]_300:250_um" "5v"
+  )
+  (via 
+    "Via[0-1]_800:450_um-GND" "Via[0-1]_800:450_um" "GND"
+  )
+  (via 
+    "Via[0-1]_1000:850_um-GND" "Via[0-1]_1000:850_um" "GND"
+  )
+  (via 
+    "Via[0-1]_600:480_um-GND" "Via[0-1]_600:480_um" "GND"
+  )
+  (via 
+    "Via[0-1]_1600:1400_um-GND" "Via[0-1]_1600:1400_um" "GND"
+  )
+  (via 
+    "Via[0-1]_400:300_um-GND" "Via[0-1]_400:300_um" "GND"
+  )
+  (via 
+    "Via[0-1]_300:250_um-GND" "Via[0-1]_300:250_um" "GND"
+  )
+  (via 
+    "Via[0-1]_800:450_um-Open" "Via[0-1]_800:450_um" "Open"
+  )
+  (via 
+    "Via[0-1]_1000:850_um-Open" "Via[0-1]_1000:850_um" "Open"
+  )
+  (via 
+    "Via[0-1]_600:480_um-Open" "Via[0-1]_600:480_um" "Open"
+  )
+  (via 
+    "Via[0-1]_1600:1400_um-Open" "Via[0-1]_1600:1400_um" "Open"
+  )
+  (via 
+    "Via[0-1]_400:300_um-Open" "Via[0-1]_400:300_um" "Open"
+  )
+  (via 
+    "Via[0-1]_300:250_um-Open" "Via[0-1]_300:250_um" "Open"
+  )
+  (via 
+    "Via[0-1]_800:450_um-pwm" "Via[0-1]_800:450_um" "pwm"
+  )
+  (via 
+    "Via[0-1]_1000:850_um-pwm" "Via[0-1]_1000:850_um" "pwm"
+  )
+  (via 
+    "Via[0-1]_600:480_um-pwm" "Via[0-1]_600:480_um" "pwm"
+  )
+  (via 
+    "Via[0-1]_1600:1400_um-pwm" "Via[0-1]_1600:1400_um" "pwm"
+  )
+  (via 
+    "Via[0-1]_400:300_um-pwm" "Via[0-1]_400:300_um" "pwm"
+  )
+  (via 
+    "Via[0-1]_300:250_um-pwm" "Via[0-1]_300:250_um" "pwm"
+  )
+  (via_rule
+    "default" "Via[0-1]_300:250_um"
+  )
+  (via_rule
+    "kicad_default" "Via[0-1]_800:450_um-kicad_default"
+  )
+  (via_rule
+    "+VDC" "Via[0-1]_1000:850_um-+VDC"
+  )
+  (via_rule
+    "12V" "Via[0-1]_600:480_um-12V"
+  )
+  (via_rule
+    "5v" "Via[0-1]_1600:1400_um-5v"
+  )
+  (via_rule
+    "GND" "Via[0-1]_400:300_um-GND"
+  )
+  (via_rule
+    "Open" "Via[0-1]_300:250_um-Open"
+  )
+  (via_rule
+    "pwm" "Via[0-1]_400:300_um-pwm"
+  )
+  (class "default"
+    "INT0" "INT1" "M1A" "M1B" "M2A" "M2B" "M3A" "M3B"
+    "M4A" "M4B" "M5A" "WS2812" "Serial2-TX" "Serial2-RX" "Serial1-TX" "Serial1-RX"
+    "INT3" "INT4" "INT5" "CTRL1" "CTRL2" "CTRL3" "CTRL4" "CTRL5"
+    "CTRL6" "CTRL7" "CTRL8" "CTRL9" "CTRL10" "CTRL11" "M5B" "M6A"
+    "M6B" "MISO" "MOSI" "SCK" "Net-(BZ1-Pad2)" "Sig18" "Sig19" "Sig20"
+    "Sig21" "Sig22" "Sig23" "Sig24" "Sig25" "Sig26" "Sig27" "Sig28"
+    "Sig29" "Sig30" "Sig31" "Sig32" "Sig33" "Sig1" "Sig2" "Sig3"
+    "Sig4" "Sig5" "Sig6" "Sig7" "Sig8" "Sig9" "Sig10" "Sig11"
+    "CTRL12" "Sig12" "Sig13" "Sig14" "Sig15" "Sig16" "Sig17" "Net-(D1-Pad1)"
+    "Net-(D2-Pad1)" "Net-(D3-Pad1)" "Net-(D4-Pad1)" "Net-(J1-Pad1)" "Net-(J1-Pad2)" "Net-(J1-Pad3)" "Net-(J1-Pad4)" "Net-(J1-Pad5)"
+    "Net-(J1-Pad6)" "Net-(J1-Pad7)" "Net-(J1-Pad8)" "Net-(J2-Pad1)" "Net-(J2-Pad2)" "Net-(J2-Pad3)" "Net-(J2-Pad4)" "Net-(J2-Pad5)"
+    "Net-(J2-Pad6)" "Net-(J2-Pad7)" "Net-(J2-Pad8)" "Net-(J3-Pad2)" "Net-(J3-Pad3)" "Net-(J3-Pad4)" "Net-(J3-Pad5)" "Net-(J3-Pad6)"
+    "Net-(J3-Pad7)" "Net-(J3-Pad8)" "Net-(J21-Pad8)" "Net-(J21-Pad7)" "Net-(J21-Pad6)" "Net-(J21-Pad5)" "Net-(J21-Pad4)" "Net-(J21-Pad3)"
+    "Net-(J21-Pad2)" "Net-(J21-Pad1)" "Net-(J20-Pad8)" "Net-(J20-Pad7)" "Net-(J20-Pad6)" "Net-(J20-Pad5)" "Net-(J20-Pad4)" "Net-(J20-Pad3)"
+    "INT-0" "Net-(J20-Pad2)" "INT-1" "Net-(J20-Pad1)" "INT-2" "Net-(R3-Pad2)" "INT-3" "Net-(J18-Pad8)"
+    "INT2" "Net-(J18-Pad7)" "Net-(J18-Pad6)" "Net-(J18-Pad5)" "Net-(J18-Pad4)" "Net-(J18-Pad3)" "Net-(J18-Pad2)" "Net-(J18-Pad1)"
+    "Net-(J8-Pad1)" "Net-(J8-Pad2)" "Net-(J13-Pad1)" "Net-(J13-Pad2)" "Net-(J13-Pad3)" "Net-(J13-Pad4)" "Net-(R8-Pad2)" "Net-(R9-Pad2)"
+    "Net-(J13-Pad5)" "Net-(J13-Pad6)" "Net-(J13-Pad7)" "Net-(J13-Pad8)" "Net-(R14-Pad2)" "Net-(J14-Pad1)" "Net-(R16-Pad2)" "Net-(J14-Pad2)"
+    "Net-(R20-Pad2)" "Net-(R21-Pad2)" "Net-(R22-Pad2)" "Net-(J14-Pad3)" "Net-(J14-Pad4)" "Net-(J14-Pad5)" "Net-(J14-Pad6)" "Net-(J14-Pad7)"
+    "Net-(J14-Pad8)" "Net-(J15-Pad1)" "Net-(J15-Pad2)" "Net-(J15-Pad3)" "Net-(J15-Pad4)" "Net-(J15-Pad6)" "Net-(J15-Pad7)" "Net-(J15-Pad8)"
+    "Net-(J24-Pad2)" "Net-(R25-Pad2)" "Net-(R26-Pad2)" "Net-(J24-Pad3)" "Net-(R27-Pad2)" "Net-(JP1-Pad2)" "Net-(R28-Pad2)" "Net-(JP2-Pad2)"
+    "Net-(R1-Pad2)" "Net-(R2-Pad2)" "Net-(R4-Pad2)" "Net-(R5-Pad2)" "Net-(R6-Pad2)" "Net-(R7-Pad2)" "Net-(R10-Pad2)" "Net-(R11-Pad2)"
+    "Net-(R12-Pad2)" "Net-(J3-Pad1)" "Net-(R13-Pad2)" "Net-(R15-Pad2)" "Net-(R19-Pad2)" "Net-(R23-Pad2)" "Net-(R24-Pad2)" "Net-(R29-Pad2)"
+    "Net-(R30-Pad2)" "Net-(RN4-Pad2)" "Net-(RN4-Pad3)" "Net-(RN4-Pad4)" "Net-(RN4-Pad5)" "Net-(RN4-Pad6)" "Net-(RN4-Pad7)" "Net-(RN5-Pad7)"
+    "Net-(RN5-Pad8)" "Net-(RN5-Pad9)" "Net-(RN4-Pad8)" "Net-(RN4-Pad9)" "Net-(RN5-Pad2)" "Net-(RN5-Pad3)" "Net-(RN5-Pad4)" "Net-(RN6-Pad7)"
+    "Net-(RN6-Pad8)" "Net-(RN6-Pad9)" "Net-(RN5-Pad5)" "Net-(RN5-Pad6)" "Net-(J27-Pad1)" "Net-(RN6-Pad2)" "Net-(J15-Pad5)" "Net-(RN6-Pad3)"
+    "Net-(RN6-Pad4)" "Net-(D2-Pad2)" "Net-(RN6-Pad5)" "Net-(D3-Pad2)" "Net-(RN6-Pad6)" "Net-(D4-Pad2)" "unconnected-(H5-Pad1)" "Net-(Q1-Pad2)"
+    "Net-(Q1-Pad3)" "Net-(TB1-Pad24)" "Net-(TB1-Pad23)" "Net-(TB1-Pad22)" "Net-(TB1-Pad21)" "Net-(TB1-Pad20)" "Net-(TB1-Pad19)" "Net-(TB1-Pad18)"
+    "Net-(TB1-Pad17)" "Net-(TB1-Pad16)" "Net-(TB1-Pad15)" "Net-(TB1-Pad14)" "Net-(TB1-Pad13)" "Net-(TB1-Pad12)" "Net-(TB1-Pad11)" "Net-(TB1-Pad10)"
+    "Net-(TB1-Pad9)"
+    (clearance_class "default")
+    (via_rule "default")
+    (rule
+      (width 400.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "kicad_default"
+    (clearance_class "kicad_default")
+    (via_rule "kicad_default")
+    (rule
+      (width 400.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "+VDC"
+    "+VDC"
+    (clearance_class "+VDC")
+    (via_rule "+VDC")
+    (rule
+      (width 800.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "12V"
+    "+12P"
+    (clearance_class "12V")
+    (via_rule "12V")
+    (rule
+      (width 500.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "5v"
+    "+5V" "+5VP"
+    (clearance_class "5v")
+    (via_rule "5v")
+    (rule
+      (width 1400.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "GND"
+    "GND"
+    (clearance_class "GND")
+    (via_rule "GND")
+    (rule
+      (width 200.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "Open"
+    "unconnected-(XA1-Pad3V3)" "unconnected-(XA1-Pad5V1)" "unconnected-(XA1-Pad5V2)" "unconnected-(XA1-PadAREF)" "unconnected-(XA1-PadGND4)" "unconnected-(XA1-PadIORF)" "unconnected-(XA1-PadRST1)" "unconnected-(XA1-PadRST2)"
+    "unconnected-(H1-Pad1)" "unconnected-(H2-Pad1)" "unconnected-(H3-Pad1)" "unconnected-(H4-Pad1)"
+    (clearance_class "Open")
+    (via_rule "Open")
+    (rule
+      (width 200.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "pwm"
+    "M6A*"
+    (clearance_class "pwm")
+    (via_rule "pwm")
+    (rule
+      (width 300.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+)
