@@ -12,13 +12,12 @@
 
 // How many NeoPixels are attached to the Arduino?
 #define LED_COUNT_1 15
-#define LED_COUNT_2 15
 
 // Declare our NeoPixel strip object:
 Adafruit_NeoPixel strip1(LED_COUNT_1, LED_PIN_1, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel strip2(LED_COUNT_1, LED_PIN_2, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel strip3(LED_COUNT_1, LED_PIN_3, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel strip4(LED_COUNT_2, LED_PIN_4, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip4(LED_COUNT_1, LED_PIN_4, NEO_GRB + NEO_KHZ800);
 // Argument 1 = Number of pixels in NeoPixel strip
 // Argument 2 = Arduino pin number (most are valid)
 // Argument 3 = Pixel type flags, add together as needed:

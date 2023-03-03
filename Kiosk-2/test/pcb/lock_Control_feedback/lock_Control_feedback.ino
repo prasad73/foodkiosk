@@ -29,7 +29,7 @@
 // #define lock14 44
 
 
-#define drive_time 1500
+#define drive_time 1200
 
 void setup(){
 	Serial.begin(115200);
