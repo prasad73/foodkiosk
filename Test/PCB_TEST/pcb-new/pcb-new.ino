@@ -49,8 +49,8 @@ void setup(){
 	Serial.println("Press F: Turn ON all LED's");
 
 	strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
-    strip.show();            // Turn OFF all pixels ASAP
-    strip.setBrightness(255); // Set BRIGHTNESS to about 1/5 (max = 255)
+  strip.show();            // Turn OFF all pixels ASAP
+  strip.setBrightness(255); // Set BRIGHTNESS to about 1/5 (max = 255)
 }
 
 void loop(){
@@ -64,7 +64,7 @@ void loop(){
 			R_state = !R_state;
 		}
 		else if(data == 'E') { colorWipe(strip.Color(0,   0,   0), 1);} // off
-		else if(data == 'F') { colorWipe(strip.Color(255,   255,   255), 1);} // off
+		else if(data == 'F') { colorWipe(strip.Color(255,   255,   255), 1);} // on
 		else if(data == '1'){
 				digitalWrite(Locks[0] , HIGH);
 				delay(500);

@@ -1,0 +1,162 @@
+
+(rules PCB ws2812-light
+  (snap_angle 
+    fortyfive_degree
+  )
+  (autoroute_settings
+    (fanout off)
+    (autoroute on)
+    (postroute on)
+    (vias on)
+    (via_costs 50)
+    (plane_via_costs 5)
+    (start_ripup_costs 100)
+    (start_pass_no 5)
+    (layer_rule "F.Cu"
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 8.1)
+    )
+    (layer_rule "B.Cu"
+      (active on)
+      (preferred_direction vertical)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.1)
+    )
+  )
+  (rule
+    (width 400.0)
+    (clear 300.2)
+    (clear 200.0 (type smd_to_turn_gap))
+    (clear 400.2 (type "default"-"5V"))
+    (clear 400.2 (type "default"-"Data"))
+    (clear 75.0 (type "smd"-"smd"))
+    (clear 400.2 (type "smd"-"5V"))
+    (clear 400.2 (type "smd"-"Data"))
+    (clear 400.2 (type "kicad_default"-"5V"))
+    (clear 400.2 (type "kicad_default"-"Data"))
+    (clear 400.2 (type "5V"-"5V"))
+    (clear 400.2 (type "5V"-"Data"))
+    (clear 400.2 (type "Data"-"Data"))
+  )
+  (padstack "Via[0-1]_800:500_um"
+    (shape
+      (circle "F.Cu" 800.0 0.0 0.0)
+    )
+    (shape
+      (circle "B.Cu" 800.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (padstack "Via[0-1]_1900:1600_um"
+    (shape
+      (circle "F.Cu" 1900.0 0.0 0.0)
+    )
+    (shape
+      (circle "B.Cu" 1900.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (padstack "Via[0-1]_800:550_um"
+    (shape
+      (circle "F.Cu" 800.0 0.0 0.0)
+    )
+    (shape
+      (circle "B.Cu" 800.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (via 
+    "Via[0-1]_800:500_um" "Via[0-1]_800:500_um" "default"
+  )
+  (via 
+    "Via[0-1]_1900:1600_um" "Via[0-1]_1900:1600_um" "default"
+  )
+  (via 
+    "Via[0-1]_800:550_um" "Via[0-1]_800:550_um" "default"
+  )
+  (via 
+    "Via[0-1]_800:500_um-kicad_default" "Via[0-1]_800:500_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_1900:1600_um-kicad_default" "Via[0-1]_1900:1600_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_800:550_um-kicad_default" "Via[0-1]_800:550_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_800:500_um-5V" "Via[0-1]_800:500_um" "5V"
+  )
+  (via 
+    "Via[0-1]_1900:1600_um-5V" "Via[0-1]_1900:1600_um" "5V"
+  )
+  (via 
+    "Via[0-1]_800:550_um-5V" "Via[0-1]_800:550_um" "5V"
+  )
+  (via 
+    "Via[0-1]_800:500_um-Data" "Via[0-1]_800:500_um" "Data"
+  )
+  (via 
+    "Via[0-1]_1900:1600_um-Data" "Via[0-1]_1900:1600_um" "Data"
+  )
+  (via 
+    "Via[0-1]_800:550_um-Data" "Via[0-1]_800:550_um" "Data"
+  )
+  (via_rule
+    "default" "Via[0-1]_800:500_um"
+  )
+  (via_rule
+    "kicad_default" "Via[0-1]_800:500_um-kicad_default"
+  )
+  (via_rule
+    "5V" "Via[0-1]_1900:1600_um-5V"
+  )
+  (via_rule
+    "Data" "Via[0-1]_800:550_um-Data"
+  )
+  (class "default"
+    "Net-(D1-Pad2)" "GND" "Net-(D2-Pad2)" "Net-(D3-Pad2)" "Net-(D4-Pad2)" "Net-(D5-Pad2)" "Net-(D6-Pad2)" "Net-(D7-Pad2)"
+    "Net-(D8-Pad2)" "Net-(D10-Pad4)" "unconnected-(H1-Pad1)"
+    (clearance_class "default")
+    (via_rule "default")
+    (rule
+      (width 400.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "kicad_default"
+    (clearance_class "kicad_default")
+    (via_rule "kicad_default")
+    (rule
+      (width 400.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "5V"
+    "+5V"
+    (clearance_class "5V")
+    (via_rule "5V")
+    (rule
+      (width 1500.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "Data"
+    "DIN" "DOUT"
+    (clearance_class "Data")
+    (via_rule "Data")
+    (rule
+      (width 500.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+)

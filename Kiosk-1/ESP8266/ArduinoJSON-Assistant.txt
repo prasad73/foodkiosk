@@ -1,0 +1,29 @@
+// std::istream& input;
+
+DynamicJsonDocument doc(3072);
+
+DeserializationError error = deserializeJson(doc, input);
+
+if (error) {
+  Serial.print(F("deserializeJson() failed: "));
+  Serial.println(error.f_str());
+  return;
+}
+
+const char* id = doc["id"]; // "6418065f4fbb671f149c0823"
+const char* name = doc["name"]; // "lulu locker 1"
+
+for (JsonObject locker_boxe : doc["locker_boxes"].as<JsonArray>()) {
+
+  const char* locker_boxe_id = locker_boxe["id"]; // "6418065f4fbb671f149c0824", ...
+  int locker_boxe_number = locker_boxe["number"]; // 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+  bool locker_boxe_is_locked = locker_boxe["is_locked"]; // true, false, false, false, false, false, ...
+  bool locker_boxe_is_occupied = locker_boxe["is_occupied"]; // true, false, false, false, false, false, ...
+  bool locker_boxe_temp_below_threshold = locker_boxe["temp_below_threshold"]; // false, false, false, ...
+
+  const char* locker_boxe_order_locker_box_content_id = locker_boxe["order"]["locker_box_content_id"];
+
+  const char* locker_boxe_order_customer_name = locker_boxe["order"]["customer"]["name"]; // "23432432", ...
+  const char* locker_boxe_order_customer_phone = locker_boxe["order"]["customer"]["phone"]; // "3", ...
+
+}
