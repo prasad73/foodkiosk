@@ -1,9 +1,12 @@
 #include <Adafruit_NeoPixel.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial mySerial(53, 25); // RX, TX ----> 53,25
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define Boxes 10                 // No. of boxes present in current Kiosk
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define LED_PIN  21
-#define LED_COUNT 51
+#define LED_COUNT 50
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define lock1 12
 #define lock2 7
@@ -18,19 +21,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define drive_time 500          // Relay drive time
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define INPUT_SIZE 20            // Size of data stream received from ESP8266 to Mega 
+#define INPUT_SIZE 21            // Size of data stream received from ESP32 to Mega 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int box_Status[Boxes];           // Box state from web stored here
 int data_tracker = 0 ;           // tracker to check whether all data is received or not
 bool data_recieved = false;      // data-received from ESP8266 or not
+unsigned long SendTriggerTime;   // Used to check trigger command duration
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int Locks[] = {lock1,lock2,lock3,lock4,lock5,lock6,lock7,lock8,lock9,lock10};
 int No_of_locks = Boxes;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int led_sequence[9][4]={{40,41,42,43}, {28,29,30,31}, {16,17,18,19}, {44,45,46,47}, {32,33,34,35}, {20,21,22,23}, {48,49,50,50}, {36,37,38,39}, {24,25,26,27}};
+int led_sequence[9][4]={{39,40,41,42}, {27,28,29,30}, {15,16,17,18}, {43,44,45,46}, {31,32,33,34}, {19,20,21,22}, {47,48,49,49}, {35,36,37,38}, {23,24,25,26}};
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool web_door_status[Boxes] = {false, false, false, false, false, false, false, false, false, false};
+bool web_door_status[Boxes] = {false, false, false, false, false, false, false, false, false, false};  // flag to keep track of -> door unlocked states to keep food or take food
+bool send_box_data[Boxes] =  {false, false, false, false, false, false, false, false, false, false};   // flag to keep track of -> Sensor data Push after every door unlocking operation
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 void setup() {
   for(int i=0; i<No_of_locks;i++){
@@ -38,8 +43,8 @@ void setup() {
     digitalWrite(Locks[i], LOW);
   }
  
-  Serial.begin(115200);
-  Serial1.begin(115200);
+  Serial.begin(9600);
+  mySerial.begin(9600);
 
   strip.begin();            // INITIALIZE NeoPixel strip object (REQUIRED)
   strip.show();             // Turn OFF all pixels ASAP
@@ -56,8 +61,8 @@ void loop() {
   ///////////////////////////////////////////////////////////////////////////////////
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
   /////////////////////////Process serial command here///////////////////////////////
-  if(Serial1.available()){
-    char command = Serial1.read();
+  if(mySerial.available()){
+    char command = mySerial.read();
     Serial.print("Command = ");
     Serial.print(command);
     Serial.println(" Recieved");
@@ -170,6 +175,8 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock1, LOW);
         update_led(0, 0);
+        send_box_data[0] = true;
+        SendTriggerTime = millis();
       }
     }
     else if(command == 'b'){
@@ -180,6 +187,8 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock2, LOW);
         update_led(0, 1);
+        send_box_data[1] = true;
+        SendTriggerTime = millis();
       }
     }
     else if(command == 'c'){
@@ -190,6 +199,8 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock3, LOW);
         update_led(0, 2);
+        send_box_data[2] = true;
+        SendTriggerTime = millis();
       }
     }
     else if(command == 'd'){
@@ -200,6 +211,8 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock4, LOW);
         update_led(0, 3);
+        send_box_data[3] = true;
+        SendTriggerTime = millis();
       }
     }
     else if(command == 'e'){
@@ -210,6 +223,8 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock5, LOW);
         update_led(0, 4);
+        send_box_data[4] = true;
+        SendTriggerTime = millis();
       }
     }
     else if(command == 'f'){
@@ -220,6 +235,8 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock6, LOW);
         update_led(0, 5);
+        send_box_data[5] = true;
+        SendTriggerTime = millis();
       }
     }
     else if(command == 'g'){
@@ -230,6 +247,8 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock7, LOW);
         update_led(0, 6);
+        send_box_data[6] = true;
+        SendTriggerTime = millis();
       }
     }
     else if(command == 'h'){
@@ -240,6 +259,8 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock8, LOW);
         update_led(0, 7);
+        send_box_data[7] = true;
+        SendTriggerTime = millis();
       }
     }
     else if(command == 'i'){
@@ -250,6 +271,8 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock9, LOW);
         update_led(0, 8);
+        send_box_data[8] = true;
+        SendTriggerTime = millis();
       }
     }
     else if(command == 'j'){
@@ -260,9 +283,14 @@ void loop() {
         delay(drive_time);
         digitalWrite(lock10, LOW);
         update_led(0, 9);
+        send_box_data[9] = true;
+        SendTriggerTime = millis();
       }
     }
     command = '#';
+  }
+  for(int i=0; i<10; i++){
+    
   }
   ///////////////////////////////////////////////////////////////////////////////////
 }
@@ -286,7 +314,7 @@ void update_led(int state, int box_number){
       }
     }
     else if(box_number == 9){
-      for(int i=0; i<16; i++) { // For each pixel in strip...
+      for(int i=0; i<15; i++) { // For each pixel in strip...
         strip.setPixelColor(i, strip.Color(0,   0,   255));         //  Set pixel's color (in RAM)
         strip.show();                          //  Update strip to match
         delay(1);                              //  Pause for a moment
@@ -302,7 +330,7 @@ void update_led(int state, int box_number){
       }
     }
     else if(box_number == 9){
-      for(int i=0; i<16; i++) { // For each pixel in strip...
+      for(int i=0; i<15; i++) { // For each pixel in strip...
         strip.setPixelColor(i, strip.Color(0,   255,   0));         //  Set pixel's color (in RAM)
         strip.show();                          //  Update strip to match
         delay(1);                              //  Pause for a moment
@@ -316,20 +344,26 @@ void update_state(){
   //Update logic States for door Occupied or not
   //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     while(1){
-      Serial1.println('S');   //Start ---> request to ESP
-      Serial.println('S trigger sent');
-      delay(5000);
-      if(Serial1.available()){ //Example String_data="1:1:0:0:1:0:1:1:0:0:0:0:&";
-        Serial.println("Something received");
+
+      mySerial.println("S");   //Start ---> request to ESP
+      Serial.println("S trigger sent");
+      Serial.flush();
+      if(mySerial.available()){ //Example String_data="1:1:0:0:1:0:1:1:0:0:0:0:&";
         char input[INPUT_SIZE];
-        size_t size = Serial1.readBytesUntil('&', input, INPUT_SIZE);
+
+        // size_t size = mySerial.readBytesUntil('&', input, INPUT_SIZE);
+        String data = mySerial.readStringUntil('&');
         Serial.print("data_recieved = ");
-        Serial.println(input);
+        Serial.println(data);
+
+        data.toCharArray(input, INPUT_SIZE);
+
+        size_t size = strlen(input);
         Serial.print("Size of data_recieved = ");
         Serial.println(size);
 
-
-        if(size == INPUT_SIZE){
+        if(size == INPUT_SIZE-1){
+          Serial.println("Processing data...");
           // Read each command pair 
           char* command = strtok(input, ":");
           int index=0;
@@ -343,22 +377,26 @@ void update_state(){
                 command = strtok(NULL, ":");
             }
             for(int i=0; i<Boxes;i++) if((box_Status[i]>=0) &&(box_Status[i]<=1)) data_tracker++;
+              Serial.print("data tracker = "); Serial.println(data_tracker);
             if(data_tracker == Boxes) {data_recieved = true; data_tracker=0;}  
           }
         }
       }
 
       if(data_recieved){
-        Serial.println("Data received successfully");
+        Serial.println("[[[[[[Data received successfully]]]]]]");
         for(int i=0; i<Boxes; i++) {
           if(box_Status[i]==1) {web_door_status[i] = true; update_led(1,i);}
           else {web_door_status[i] = false; update_led(0,i);}
         }
-        Serial1.println('s'); //Stop ---> request to ESP
-        Serial.println("s triggger sent");
+        mySerial.println("s"); //Stop ---> request to ESP
+        Serial.println("small s triggger sent  ------------------------>");
         data_recieved = false;
         break;
-      }    
+      }
+      // mySerial.println("Z");   //Start ---> request to ESP
+      // Serial.println("Z trigger sent");    
+      delay(1000);
     } 
 }
 ////////////////////////////////////////////////////////////////////////////////
