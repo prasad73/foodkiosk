@@ -1,0 +1,35 @@
+Please find the Locker Trigger Workflow
+-----------------------------------------------------------------------------------------------
+Default Status:
+is_locked: true
+is_occupied: false
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To place an Item, change
+Input from server:
+is_locked: false 
+
+Response from IOT, once the product is added to the locker:
+is_locked: true 
+is_occupied : true
+A pickup schedule SMS needs to be sent 
+-----------------------------------------------------------------------------------------------
+To pick an Item, change
+
+Input from server:
+is_locked: false
+
+Response from IOT, once the product pickup is done:
+is_locked: true 
+is_occupied : false
+temp_below_threshold: false
+Pickup completed SMS needs to be sent
+-----------------------------------------------------------------------------------------------
+SMS Trigger regarding temperature threshold:
+
+Default status of all boxes:  "temp_below_threshold": false
+
+if Status on the server side:
+is_locked: true 
+is_occupied : true
+"temp_below_threshold": true
+A below temperature threshold SMS needs to be sent just once only.

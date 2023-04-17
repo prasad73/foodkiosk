@@ -5,15 +5,15 @@
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 
-#ifndef STASSID
+/*#ifndef STASSID
 #define STASSID "BSNL-FTTH-1908"
 #define STAPSK  "vtk2361908"
-#endif
+#endif*/
 
-/*#ifndef STASSID
+#ifndef STASSID
 #define STASSID "Rapid-Abhi"
 #define STAPSK  "Rapidcode12"
-#endif*/
+#endif
 
 #define get_link "https://locker-api.versicles.com/locker/6418065f4fbb671f149c0823.json"  //Update this link for different lockers
 #define parse_check "{\"id\": \"6418065f4fbb671f149c0823\""                               //update this json response for every locker
@@ -212,12 +212,12 @@ void loop() {
       StaticJsonDocument<192> sensor;
       String sensor_json;
 
-      sensor["locker_id"] = "6418065f4fbb671f149c0823";
+      sensor["locker_id"] = "6418065f4fbb671f149c0823"; 
       sensor["ip_address"] = "111.222.333.444";
-      sensor["locker_box_id"] = "9";
+      sensor["locker_box_id"] = "6418065f4fbb671f149c082a";
 
       JsonObject properties = sensor.createNestedObject("properties");
-      properties["is_locked"] = false;
+      properties["is_locked"] = true;
       properties["is_occupied"] = false;
       properties["temp_below_threshold"] = false;
 
