@@ -355,11 +355,12 @@ void loop(){
 			delay(drive_time);
 			digitalWrite(lock12, LOW);
 
-			digitalWrite(S0 , LOW);
+			digitalWrite(S0 , HIGH);
       		digitalWrite(S1 , HIGH);	
       		digitalWrite(S2 , LOW);
       		digitalWrite(S3 , HIGH);
       		Serial.println("Sensor-12  Selected");  
+      		box_number = 12;
 		}
 	}
 
