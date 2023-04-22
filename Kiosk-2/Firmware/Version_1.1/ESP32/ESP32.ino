@@ -8,10 +8,15 @@
 #define LED 2
 #define RXD2 16
 #define TXD2 17
-#define box_count 10
+#define box_count 12
 
-#define box_ip "111.222.333.444"
+#define box_ip "111.333.444.555"
 #define polling_time 2000
+
+// #ifndef STASSID
+// #define STASSID "verifygn"
+// #define STAPSK  "verifygn@2020"
+// #endif
 
 /*#ifndef STASSID
 #define STASSID "BSNL-FTTH-1908"
@@ -24,13 +29,12 @@
 // #endif
 
 #ifndef STASSID
-#define STASSID "Nokia C01 Plus"
+#define STASSID "Vendigo-2"
 #define STAPSK  "versicles123"
 #endif
 
-
-#define get_link "https://locker-api.versicles.com/locker/6418065f4fbb671f149c0823.json"  //Update this link for different lockers
-#define parse_check "{\"id\": \"6418065f4fbb671f149c0823\""                               //update this json response for every locker
+#define get_link "https://locker-api.versicles.com/locker/641d35fb29dd881c34916f30.json"  //Update this link for different lockers
+#define parse_check "{\"id\": \"641d35fb29dd881c34916f30\""                               //update this json response for every locker
 #define put_link "https://locker-iot-api.versicles.com/locker-box"                        //Update this link for different lockers
 //////////////////////////////////////////////////////////////////////////////
 const char* put_host = "https://locker-iot-api.versicles.com";
@@ -66,17 +70,19 @@ bool Send_trigger = false;
 bool state = HIGH;
 bool send_response = false;
 
-String web_sequence = "";   //"0:0:0:0:0:0:0:0:0:0:&"
-bool Unlock_doors_keep_food[] = {false,false,false,false,false,false,false,false,false,false};
-bool Unlock_doors_Collect_food[] = {false,false,false,false,false,false,false,false,false,false};
+String web_sequence = "";   //"0:0:0:0:0:0:0:0:0:0:0:0:&"
+bool Unlock_doors_keep_food[] = {false,false,false,false,false,false,false,false,false,false,false,false};
+bool Unlock_doors_Collect_food[] = {false,false,false,false,false,false,false,false,false,false,false,false};
 
-bool response_is_locked[] =  {true, true, true, true, true, true, true, true, true, true};
-bool response_is_Occupied[] = {false,false,false,false,false,false,false,false,false,false};
-bool response_temp_threshold[] = {false,false,false,false,false,false,false,false,false,false};
-bool update_boxes[] = {false,false,false,false,false,false,false,false,false,false};
-bool response_sent[] = {false,false,false,false,false,false,false,false,false,false};
+bool response_is_locked[] =  {true, true, true, true, true, true, true, true, true, true, true, true};
+bool response_is_Occupied[] = {false,false,false,false,false,false,false,false,false,false,false,false};
+bool response_temp_threshold[] = {false,false,false,false,false,false,false,false,false,false,false,false};
+bool update_boxes[] = {false,false,false,false,false,false,false,false,false,false,false};
+bool response_sent[] = {false,false,false,false,false,false,false,false,false,false,false};
 
-String locker_box_ids[] ={"6418065f4fbb671f149c0824","6418065f4fbb671f149c0825","6418065f4fbb671f149c0826","6418065f4fbb671f149c0827","6418065f4fbb671f149c0828","6418065f4fbb671f149c0829","6418065f4fbb671f149c082a","6418065f4fbb671f149c082b","6418065f4fbb671f149c082c","6418065f4fbb671f149c082d"};
+bool push_web_status = true;
+
+String locker_box_ids[] ={"641d35fc29dd881c34916f31","641d35fc29dd881c34916f32","641d35fc29dd881c34916f33","641d35fc29dd881c34916f34","641d35fc29dd881c34916f35","641d35fc29dd881c34916f36","641d35fc29dd881c34916f37","641d35fc29dd881c34916f38","641d35fc29dd881c34916f39","641d35fc29dd881c34916f3a","641d35fc29dd881c34916f3b","641d35fc29dd881c34916f3c"};
 
 // HardwareSerial Serial2(2) // use UART2
 
@@ -110,55 +116,57 @@ void setup(){
 	Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
 	pinMode(LED, OUTPUT);
 	digitalWrite(LED, LOW);
-
-	Serial.println();
-	Serial.println();
-	Serial.println();
 	
 	WiFi.mode(WIFI_STA);
 	WiFiMulti.addAP(ssid, password);
 
-	// wait for WiFi connection
-	Serial.print("Waiting for WiFi to connect...");
 	while ((WiFiMulti.run() != WL_CONNECTED)) {
 	Serial.print(".");
 	}
 	Serial.println(" connected");
 
-	setClock();  
-	Serial.println("Initialization Done!!");
+	// setClock();  
 
 	Get_web_Status();
 }
 
 void loop(){
-	if(Serial2.available()){
-		char command = Serial2.read();
-		if((command == 'S') && !Send_trigger){
-			Serial.println("Command S detected");
-			Serial2.flush();
-			delay(500);
-			Serial2.println(web_sequence);
-			delay(500);
-			Serial2.flush();
-			// Serial2.flush();
-			digitalWrite(LED, state);
-			state =!state;
-		}
-		else if(command == 's'){
-			Serial.println("Command small 's' detected");
-			Send_trigger = true;
-			web_sequence = "";
-		}
+	if(push_web_status){
+		if(Serial2.available()){
+			char command = Serial2.read();
+			if((command == 'S') && !Send_trigger){
+				// Serial.println("Command S detected");
+				Serial2.flush();
+				delay(500);
+				Serial2.println(web_sequence);
+				delay(500);
+				Serial2.flush();
+				// Serial2.flush();
+				digitalWrite(LED, state);
+				state =!state;
+			}
+			else if(command == 's'){
+				// Serial.println("Command small 's' detected");
+				Send_trigger = true;
+				web_sequence = "";
+				push_web_status = false;
+				Serial2.flush();
+				digitalWrite(LED, HIGH);		
+				Serial.println("Samll s trigger!!!!!!!");
+			}
+		}	
 	}
+	
 
 	if(Send_trigger){
-		Get_web_Status();
 		delay(polling_time);
-		if(send_response){
+		Get_web_Status();
+		if(send_response){  //Sending response to Master Controller
+			Serial.println("Sending Response to Master");
 			////Unlocking doors here////////////////////////////////////////////////	
 			for(int i=0; i<box_count; i++){
 				if(Unlock_doors_keep_food[i]){
+					Serial.println("Keep Food!!");
 					if(i == 0) Serial2.println("A");
 					else if(i == 1) Serial2.println("B");
 					else if(i == 2) Serial2.println("C");
@@ -169,8 +177,11 @@ void loop(){
 					else if(i == 7) Serial2.println("H");
 					else if(i == 8) Serial2.println("I");
 					else if(i == 9) Serial2.println("J");
+					else if(i == 10) Serial2.println("K");
+					else if(i == 11) Serial2.println("L");
 				}
 				else if(Unlock_doors_Collect_food[i]){
+					Serial.println("Collect Food >>>>>>>>>");
 					if(i == 0) Serial2.println("a");
 					else if(i == 1) Serial2.println("b");
 					else if(i == 2) Serial2.println("c");
@@ -181,6 +192,8 @@ void loop(){
 					else if(i == 7) Serial2.println("h");
 					else if(i == 8) Serial2.println("i");
 					else if(i == 9) Serial2.println("j");
+					else if(i == 10) Serial2.println("k");
+					else if(i == 11) Serial2.println("l");
 				} 
 			}
 			///////////////////////////////////////////////////////////////////////
@@ -203,7 +216,7 @@ void loop(){
 				}
 			}
 
-			update_response();
+			update_response(); //Updating response to the server
 			///////////////////////////////////////////////////////////////////////
 		}
 	}
@@ -219,49 +232,17 @@ void Get_web_Status(){
 	{
 	  String line; 
 	  /////////////////////////fetching data here///////////////////////////////////////////////
-	  // Use WiFiClientSecure class to create TLS connection=
-	  Serial.print("Connecting to ");
-	  Serial.println(get_link);
-
-	  Serial.print("[HTTPS] begin...\n");
 	  if (https.begin(*client, get_link)) {  // HTTPS
-	    Serial.print("[HTTPS] GET...\n");
-	    // start connection and send HTTP header
 	    int httpCode = https.GET();
 
 	    // httpCode will be negative on error
 	    if (httpCode > 0) {
-	      // HTTP header has been send and Server response header has been handled
-	      Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
-
-	      // file found at server
 	      if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
 	        line = https.getString();
-	        Serial.println(line);
 	      }
-	    } else {
-	      Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
-	    }
-
+	    } 
 	    https.end();
-	  } else {
-	    Serial.printf("[HTTPS] Unable to connect\n");
 	  }
-
-	  if (line.startsWith(parse_check)) {
-	    Serial.println("Device ID matched successfully!");
-	  } else {
-	    Serial.println("Issue with data retrieval!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-	  }
-	  Serial.println("Reply was:");
-	  Serial.println("==========");
-	  Serial.println(line);
-	  Serial.println("==========");
-	  Serial.println("Closing connection");
-
-	  Serial.println("Parsing Json from here ----------------------------->");
-
-	  // Allocate the JSON document
 	  // Use https://arduinojson.org/v6/assistant to compute the capacity.
 	  const size_t capacity = 3072; //JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
 	  DynamicJsonDocument doc(capacity);
@@ -269,20 +250,10 @@ void Get_web_Status(){
 	  // Parse JSON object
 	  DeserializationError error = deserializeJson(doc, line);
 	  if (error) {
-	    Serial.print(F("deserializeJson() failed: "));
-	    Serial.println(error.f_str());
 	    return;
 	  }
 	  const char* id = doc["id"]; // "6418065f4fbb671f149c0823"
 	  const char* name = doc["name"]; // "lulu locker 1"
-
-	  Serial.println("#################################################################");
-	  Serial.print("locker_id =");
-	  Serial.println(id);
-	  Serial.print("locker_name =");
-	  Serial.println(name);
-	  Serial.println("#################################################################");
-
 
 	  for (JsonObject locker_boxe : doc["locker_boxes"].as<JsonArray>()) {
 
@@ -295,30 +266,11 @@ void Get_web_Status(){
 	    const char* locker_boxe_order_locker_box_content_id = locker_boxe["order"]["locker_box_content_id"];
 	    const char* locker_boxe_order_customer_name = locker_boxe["order"]["customer"]["name"]; // "23432432", ...
 	    const char* locker_boxe_order_customer_phone = locker_boxe["order"]["customer"]["phone"]; // "3", ...
-	    /*
-	    Serial.print("box_id =");
-	    Serial.println(locker_boxe_id);
-	    Serial.print("box_no =");
-	    Serial.println(locker_boxe_number);
-	    Serial.print("box_is_locked =");
-	    Serial.println(locker_boxe_is_locked);
-	    Serial.print("box_is_occupied =");
-	    Serial.println(locker_boxe_is_occupied);
-	    Serial.print("box_temp_below_threshold =");
-	    Serial.println(locker_boxe_temp_below_threshold);
-	    Serial.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-	    Serial.print("box order id:");
-	    Serial.println(locker_boxe_order_locker_box_content_id);
-	    Serial.print("box order customer name:");
-	    Serial.println(locker_boxe_order_customer_name);
-	    Serial.print("box order customer phone:");
-	    Serial.println(locker_boxe_order_customer_phone);
-	    Serial.println("---------------------------------------------------------------");
-		*/
-		if(!Send_trigger){
-			if(locker_boxe_is_occupied) web_sequence += "1:";
-	    	else web_sequence += "0:"; 		
-		}
+
+			if(!Send_trigger){
+				if(locker_boxe_is_occupied) web_sequence += "1:";
+		    else web_sequence += "0:"; 		
+			}
 	    else{
 	    	if(!locker_boxe_is_locked){
 	    		if(!locker_boxe_is_occupied) {Unlock_doors_keep_food[index] = true; Unlock_doors_Collect_food[index] = false;}
@@ -340,12 +292,7 @@ void Get_web_Status(){
 	  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 	delete client;
-	} else {
-	Serial.println("Unable to create client");
 	}
-
-	Serial.println();
-	Serial.println("Fetch data cycle finished...");
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void update_response(){
@@ -361,25 +308,18 @@ void update_response(){
 	}
 	{
 	  ///////////////////////////posting data here//////////////////////////////////////////////
-
-	  // Use WiFiClientSecure class to create TLS connection
-	  Serial.print("Connecting to ");
-	  Serial.println(put_link);
-
 	  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	  //JSON CREATION
-	  Serial.println("Starting JSON Creation");
 	  // char json[] = "{\"locker_id\": \"6418065f4fbb671f149c0823\", \"ip_address\": \"222.444.111.333\", \"locker_box_id\": \"6418065f4fbb671f149c0828\", \"properties\":{\"is_locked\": true, \"is_occupied\": false, \"temp_below_threshold\": true}}";
 	  
-	  StaticJsonDocument<192> sensor;
-	  String sensor_json;
-
-	  sensor["locker_id"] = "6418065f4fbb671f149c0824"; 
-	  sensor["ip_address"] = box_ip;
-
 	  for(int i=0; i<box_count; i++){
 
 	  	if(update_boxes[i]){
+	  		StaticJsonDocument<192> sensor;
+			  String sensor_json;
+
+			  sensor["locker_id"] = "641d35fb29dd881c34916f30"; 
+			  sensor["ip_address"] = box_ip;
 	  		sensor["locker_box_id"] = locker_box_ids[i];
 	  		JsonObject properties = sensor.createNestedObject("properties");
 	  		properties["is_locked"] = response_is_locked[i];
@@ -390,45 +330,32 @@ void update_response(){
 	  		index = i;
 
 	  		serializeJson(sensor, sensor_json);
-			Serial.print("sensor_json= ");
-			Serial.println(sensor_json);
 			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-			Serial.print("[HTTPS] begin...\n");
 			// configure traged server and url
 			https.begin(*client, put_link); //HTTPS
 			https.addHeader("x-api-key", "oplpsOtoCt2b1tyztPsKO233c5w6qi3Mx0B8rsCb");
 			https.addHeader("Content-Type", "application/json");
 			https.addHeader("Accept","application/json");
-			Serial.print("[HTTPS] PUT...\n");
 			// start connection and send HTTP header and body
 			int httpCode = https.PUT(String(sensor_json));
 
 			// httpCode will be negative on error
 			if (httpCode > 0) {
 				// HTTP header has been send and Server response header has been handled
-				Serial.printf("[HTTPS] PUT... code: %d\n", httpCode);
 
 				// file found at server
 				if (httpCode == HTTP_CODE_OK) {
 					const String& payload = https.getString();
-					Serial.println("received payload:\n<<");
-					Serial.println(payload);
-					Serial.println(">>");
 					response_sent[index] = false;
 					index = 999;
 				}
-			} else {
-				Serial.printf("[HTTPS] PUT... failed, error: %s\n", https.errorToString(httpCode).c_str());
-			}
+			} 
 			https.end();
 			//////////////////////////////////////////////////////////////////////////////////////////
 	  	}
 	  }
 	}
 	delete client;
-	} else {
-	Serial.println("Unable to create client");
 	}
 
 	for(int i=0, index=0; i<box_count; i++){
@@ -436,5 +363,4 @@ void update_response(){
 		else index++;		
 	}
 	if(index == box_count) send_response = false;
-	Serial.println();
 }

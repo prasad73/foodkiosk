@@ -13,10 +13,10 @@
 #define box_ip "111.222.333.444"
 #define polling_time 2000
 
-#ifndef STASSID
-#define STASSID "verifygn"
-#define STAPSK  "verifygn@2020"
-#endif
+// #ifndef STASSID
+// #define STASSID "verifygn"
+// #define STAPSK  "verifygn@2020"
+// #endif
 
 /*#ifndef STASSID
 #define STASSID "BSNL-FTTH-1908"
@@ -27,6 +27,11 @@
 #define STASSID "Rapid-Abhi"
 #define STAPSK  "Rapidcode12"
 #endif*/
+
+#ifndef STASSID
+#define STASSID "Nokia C01 Plus"
+#define STAPSK  "versicles123"
+#endif
 
 #define get_link "https://locker-api.versicles.com/locker/6418065f4fbb671f149c0823.json"  //Update this link for different lockers
 #define parse_check "{\"id\": \"6418065f4fbb671f149c0823\""                               //update this json response for every locker

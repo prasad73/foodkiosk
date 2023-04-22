@@ -8,9 +8,9 @@
 #define LED 2
 #define RXD2 16
 #define TXD2 17
-#define box_count 10
+#define box_count 12
 
-#define box_ip "111.222.333.444"
+#define box_ip "111.333.444.555"
 #define polling_time 2000
 
 /*#ifndef STASSID
@@ -19,19 +19,23 @@
 #endif*/
 
 // #ifndef STASSID
+// #define STASSID "verifygn"
+// #define STAPSK  "verifygn@2020"
+// #endif
+
+// #ifndef STASSID
 // #define STASSID "Rapid-Abhi"
 // #define STAPSK  "Rapidcode12"
 // #endif
 
 #ifndef STASSID
-#define STASSID "Nokia C01 Plus"
+#define STASSID "Vendigo-2"
 #define STAPSK  "versicles123"
 #endif
 
-
-#define get_link "https://locker-api.versicles.com/locker/6418065f4fbb671f149c0823.json"  //Update this link for different lockers
-#define parse_check "{\"id\": \"6418065f4fbb671f149c0823\""                               //update this json response for every locker
-#define put_link "https://locker-iot-api.versicles.com/locker-box"                        //Update this link for different lockers
+#define get_link "https://locker-api.versicles.com/locker/641d35fb29dd881c34916f30.json"  //Update this link for different lockers
+#define parse_check "{\"id\": \"641d35fb29dd881c34916f30\""                               //update this json response for every locker
+#define put_link "https://locker-iot-api.versicles.com/locker-box"                         //Update this link for different lockers
 //////////////////////////////////////////////////////////////////////////////
 const char* put_host = "https://locker-iot-api.versicles.com";
 const uint16_t port = 443;
@@ -67,16 +71,16 @@ bool state = HIGH;
 bool send_response = false;
 
 String web_sequence = "";   //"0:0:0:0:0:0:0:0:0:0:&"
-bool Unlock_doors_keep_food[] = {false,false,false,false,false,false,false,false,false,false};
-bool Unlock_doors_Collect_food[] = {false,false,false,false,false,false,false,false,false,false};
+bool Unlock_doors_keep_food[] = {false,false,false,false,false,false,false,false,false,false,false,false};
+bool Unlock_doors_Collect_food[] = {false,false,false,false,false,false,false,false,false,false,false,false};
 
-bool response_is_locked[] =  {true, true, true, true, true, true, true, true, true, true};
-bool response_is_Occupied[] = {false,false,false,false,false,false,false,false,false,false};
-bool response_temp_threshold[] = {false,false,false,false,false,false,false,false,false,false};
-bool update_boxes[] = {false,false,false,false,false,false,false,false,false,false};
-bool response_sent[] = {false,false,false,false,false,false,false,false,false,false};
+bool response_is_locked[] =  {true, true, true, true, true, true, true, true, true, true, true, true};
+bool response_is_Occupied[] = {false,false,false,false,false,false,false,false,false,false,false,false};
+bool response_temp_threshold[] = {false,false,false,false,false,false,false,false,false,false,false,false};
+bool update_boxes[] = {false,false,false,false,false,false,false,false,false,false,false};
+bool response_sent[] = {false,false,false,false,false,false,false,false,false,false,false};
 
-String locker_box_ids[] ={"6418065f4fbb671f149c0824","6418065f4fbb671f149c0825","6418065f4fbb671f149c0826","6418065f4fbb671f149c0827","6418065f4fbb671f149c0828","6418065f4fbb671f149c0829","6418065f4fbb671f149c082a","6418065f4fbb671f149c082b","6418065f4fbb671f149c082c","6418065f4fbb671f149c082d"};
+String locker_box_ids[] ={"641d35fc29dd881c34916f31","641d35fc29dd881c34916f32","641d35fc29dd881c34916f33","641d35fc29dd881c34916f34","641d35fc29dd881c34916f35","641d35fc29dd881c34916f36","641d35fc29dd881c34916f37","641d35fc29dd881c34916f38","641d35fc29dd881c34916f39","641d35fc29dd881c34916f3a","641d35fc29dd881c34916f3b","641d35fc29dd881c34916f3c"};
 
 // HardwareSerial Serial2(2) // use UART2
 
@@ -149,6 +153,7 @@ void loop(){
 			Serial.println("Command small 's' detected");
 			Send_trigger = true;
 			web_sequence = "";
+			digitalWrite(LED, HIGH);
 		}
 	}
 
@@ -169,6 +174,8 @@ void loop(){
 					else if(i == 7) Serial2.println("H");
 					else if(i == 8) Serial2.println("I");
 					else if(i == 9) Serial2.println("J");
+					else if(i == 10) Serial2.println("K");
+					else if(i == 11) Serial2.println("L");
 				}
 				else if(Unlock_doors_Collect_food[i]){
 					if(i == 0) Serial2.println("a");
@@ -181,6 +188,8 @@ void loop(){
 					else if(i == 7) Serial2.println("h");
 					else if(i == 8) Serial2.println("i");
 					else if(i == 9) Serial2.println("j");
+					else if(i == 10) Serial2.println("k");
+					else if(i == 11) Serial2.println("l");
 				} 
 			}
 			///////////////////////////////////////////////////////////////////////
@@ -295,7 +304,7 @@ void Get_web_Status(){
 	    const char* locker_boxe_order_locker_box_content_id = locker_boxe["order"]["locker_box_content_id"];
 	    const char* locker_boxe_order_customer_name = locker_boxe["order"]["customer"]["name"]; // "23432432", ...
 	    const char* locker_boxe_order_customer_phone = locker_boxe["order"]["customer"]["phone"]; // "3", ...
-	    /*
+	   
 	    Serial.print("box_id =");
 	    Serial.println(locker_boxe_id);
 	    Serial.print("box_no =");
@@ -314,7 +323,7 @@ void Get_web_Status(){
 	    Serial.print("box order customer phone:");
 	    Serial.println(locker_boxe_order_customer_phone);
 	    Serial.println("---------------------------------------------------------------");
-		*/
+		
 		if(!Send_trigger){
 			if(locker_boxe_is_occupied) web_sequence += "1:";
 	    	else web_sequence += "0:"; 		
@@ -374,7 +383,7 @@ void update_response(){
 	  StaticJsonDocument<192> sensor;
 	  String sensor_json;
 
-	  sensor["locker_id"] = "6418065f4fbb671f149c0824"; 
+	  sensor["locker_id"] = "641d35fb29dd881c34916f30"; 
 	  sensor["ip_address"] = box_ip;
 
 	  for(int i=0; i<box_count; i++){

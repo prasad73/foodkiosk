@@ -85,14 +85,26 @@
 int led_column[3][5]={{0,1,2,3,4},{5,6,7,8,9},{10,11,12,13,14}};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int box_number = 0;            //Used for ultrasonic sensor
+int distance = 0;              //Used for ultrasonic sensor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool door_lock_state[12] = {false, false, false, false, false, false, false, false, false, false, false, false};
-bool food_present_state[12] = {false, false, false, false, false, false, false, false, false, false, false, false};
-bool web_door_status[12] = {false, false, false, false, false, false, false, false, false, false, false, false};
+#define Boxes 12                 // No. of boxes present in current Kiosk
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define INPUT_SIZE 25            // Size of data stream received from ESP32 to Mega 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int box_Status[Boxes];           // Box state from web stored here
+int data_tracker = 0 ;           // tracker to check whether all data is received or not
+bool data_recieved = false;      // data-received from ESP8266/ESP32 or not
+unsigned long SendTriggerTime;   // Used to check trigger command duration
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool door_lock_state[Boxes] = {false, false, false, false, false, false, false, false, false, false, false, false};
+bool food_present_state[Boxes] = {false, false, false, false, false, false, false, false, false, false, false, false};
+bool web_door_status[Boxes] = {false, false, false, false, false, false, false, false, false, false, false, false};
+bool send_box_data[Boxes] = {false, false, false, false, false, false, false, false, false, false, false, false};   // flag to keep track of -> Sensor data Push after every door unlocking operation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX//
 void setup(){
-	Serial.begin(115200);
+	Serial.begin(9600);
+	Serial3.begin(9600);
 	///////////////////////////////////////////////////////////////////////////////////
 	// Lock Initilization//////////////////////////////////////////////////////////////
 	pinMode(lock1, OUTPUT);
@@ -168,8 +180,8 @@ void setup(){
 
   ///////////////////////////////////////////////////////////////////////////////////
 	//WS2812 LED Initialization////////////////////////////////////////////////////////
-	  strip1.begin();               	// INITIALIZE NeoPixel strip object (REQUIRED)
-	  strip1.show();                	// Turn OFF all pixels ASAP
+	strip1.begin();               	// INITIALIZE NeoPixel strip object (REQUIRED)
+	strip1.show();                	// Turn OFF all pixels ASAP
     strip1.setBrightness(255);    	// Set BRIGHTNESS to about 1/5 (max = 255)
 
     strip2.begin();           	  	// INITIALIZE NeoPixel strip object (REQUIRED)
@@ -185,6 +197,7 @@ void setup(){
     strip4.setBrightness(255); 		// Set BRIGHTNESS to about 1/5 (max = 255)
   ///////////////////////////////////////////////////////////////////////////////////
   update_state();
+  update_web_status();
   update_led_status();
 
 }
@@ -195,8 +208,8 @@ void loop(){
 	///////////////////////////////////////////////////////////////////////////////////
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	/////////////////////////Process serial command here///////////////////////////////
-	if(Serial.available()){
-		char command = Serial.read();
+	if(Serial3.available()){
+		char command = Serial3.read();
 		
 		// LED Status update command
 		// update_column1(0, 0);update_column1(1, 0);update_column1(0, 1);update_column1(1, 1);update_column1(0, 2);update_column1(1, 2);
@@ -795,10 +808,13 @@ void update_state(){
 		digitalWrite(S2 , LOW);
 		digitalWrite(S3 , LOW);
 		//Serial.println("US-1  Selected");  
-		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[0] = true;
-		else food_present_state[0] = false;
-		delay(50);
+		
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[0] = true;
+			else food_present_state[0] = false;
+			delay(50);
+		} 
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock2F)) {door_lock_state[1] = false;}
 		else{ door_lock_state[1] = true;	}
@@ -810,9 +826,12 @@ void update_state(){
 		digitalWrite(S3 , LOW);
 		//Serial.println("US-2  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[1] = true;
-		else food_present_state[1] = false;
-		delay(50);
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[1] = true;
+			else food_present_state[1] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock3F)) {door_lock_state[2] = false;}
 		else{ door_lock_state[2] = true;	}
@@ -824,9 +843,12 @@ void update_state(){
 		digitalWrite(S3 , LOW);
 		//Serial.println("US-3  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[2] = true;
-		else food_present_state[2] = false;
-		delay(50);
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[2] = true;
+			else food_present_state[2] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock4F)) {door_lock_state[3] = false;}
 		else{ door_lock_state[3] = true;	}
@@ -838,8 +860,12 @@ void update_state(){
 		digitalWrite(S3 , LOW);
 		//Serial.println("US-4  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[3] = true;
-		else food_present_state[3] = false;
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[3] = true;
+			else food_present_state[3] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock5F)) {door_lock_state[4] = false;}
 		else{ door_lock_state[4] = true;	}
@@ -851,9 +877,12 @@ void update_state(){
 		digitalWrite(S3 , LOW);
 		//Serial.println("US-5  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[4] = true;
-		else food_present_state[4] = false;
-		delay(50);
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[4] = true;
+			else food_present_state[4] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock6F)) {door_lock_state[5] = false;}
 		else{ door_lock_state[5] = true;	}
@@ -865,9 +894,12 @@ void update_state(){
 		digitalWrite(S3 , LOW);
 		//Serial.println("US-6  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[5] = true;
-		else food_present_state[5] = false;
-		delay(50);
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[5] = true;
+			else food_present_state[5] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock7F)) {door_lock_state[6] = false;}
 		else{ door_lock_state[6] = true;	}
@@ -879,8 +911,12 @@ void update_state(){
 		digitalWrite(S3 , LOW);
 		//Serial.println("US-7  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[6] = true;
-		else food_present_state[6] = false;
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[6] = true;
+			else food_present_state[6] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock8F)) {door_lock_state[7] = false;}
 		else{ door_lock_state[7] = true;	}
@@ -892,9 +928,12 @@ void update_state(){
 		digitalWrite(S3 , LOW);
 		//Serial.println("US-8  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[7] = true;
-		else food_present_state[7] = false;
-		delay(50);
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[7] = true;
+			else food_present_state[7] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock9F)) {door_lock_state[8] = false;}
 		else{ door_lock_state[8] = true;	}
@@ -906,9 +945,12 @@ void update_state(){
 		digitalWrite(S3 , HIGH);
 		//Serial.println("US-9  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[8] = true;
-		else food_present_state[8] = false;
-		delay(50);
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[8] = true;
+			else food_present_state[8] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock10F)) {door_lock_state[9] = false;}
 		else{ door_lock_state[9] = true;	}
@@ -920,9 +962,12 @@ void update_state(){
 		digitalWrite(S3 , HIGH);
 		//Serial.println("US-10  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[9] = true;
-		else food_present_state[9] = false;
-		delay(50);
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[9] = true;
+			else food_present_state[9] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock11F)) {door_lock_state[10] = false;}
 		else{ door_lock_state[10] = true;	}
@@ -934,27 +979,94 @@ void update_state(){
 		digitalWrite(S3 , HIGH);
 		//Serial.println("US-11  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[10] = true;
-		else food_present_state[10] = false;
-		delay(50);
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[10] = true;
+			else food_present_state[10] = false;
+			delay(50);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if(!digitalRead(lock12F)) {door_lock_state[11] = false;}
 		else{ door_lock_state[11] = true;	}
 
 		//Ultrasonic Controls
 		digitalWrite(S0 , HIGH);
-	  digitalWrite(S1 , HIGH);	
-	  digitalWrite(S2 , LOW);
-	  digitalWrite(S3 , HIGH);
+	    digitalWrite(S1 , HIGH);	
+	    digitalWrite(S2 , LOW);
+	    digitalWrite(S3 , HIGH);
 		//Serial.println("US-12  Selected");  
 		  
-		if(sonar.ping_cm() < Item_distance) food_present_state[11] = true;
-		else food_present_state[11] = false;
-		delay(50);
+		distance = sonar.ping_cm();
+		if(distance > 0){
+			if(distance < Item_distance) food_present_state[11] = true;
+			else food_present_state[11] = false;
+			delay(50);
+		}
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	///////////////////////////////////////////////////////////////////////////////////
 
 	//##################################################################################################################################################################
+}
+////////////////////////////////////////////////////////////////////////////////
+void update_web_status(){
+  //##################################################################################################################################################################
+  //Update logic States for door Occupied or not
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    while(1){
+
+      Serial3.println("S");   //Start ---> request to ESP
+      // Serial.println("S trigger sent");
+      Serial.flush();
+      if(Serial3.available()){ //Example String_data="1:1:0:0:1:0:1:1:0:0:0:0:&";
+        char input[INPUT_SIZE];
+
+        // size_t size = Serial3.readBytesUntil('&', input, INPUT_SIZE);
+        String data = Serial3.readStringUntil('&');
+        // Serial.print("data_recieved = ");
+        // Serial.println(data);
+
+        data.toCharArray(input, INPUT_SIZE);
+
+        size_t size = strlen(input);
+        Serial.print("Size of data_recieved = ");
+        Serial.println(size);
+
+        if(size == INPUT_SIZE-1){
+          // Serial.println("Processing data...");
+          // Read each command pair 
+          char* command = strtok(input, ":");
+          int index=0;
+          if((command[0] == '0') || (command[0] == '1')){
+            while (command != NULL)
+            { 
+                if(index<(INPUT_SIZE/2)) {
+                  box_Status[index++] = atoi(command);
+                }          
+                // Find the next command in input string
+                command = strtok(NULL, ":");
+            }
+            for(int i=0; i<Boxes;i++) if((box_Status[i]>=0) &&(box_Status[i]<=1)) data_tracker++;
+              // Serial.print("data tracker = "); Serial.println(data_tracker);
+            if(data_tracker == Boxes) {data_recieved = true; data_tracker=0;}  
+          }
+        }
+      }
+
+      if(data_recieved){
+        // Serial.println("[[[[[[Data received successfully]]]]]]");
+        for(int i=0; i<Boxes; i++) {
+          if(box_Status[i]==1) {web_door_status[i] = true;}
+          else {web_door_status[i] = false;}
+        }
+        Serial3.println("s"); //Stop ---> request to ESP
+        // Serial.println("small s triggger sent  ------------------------>");
+        data_recieved = false;
+        break;
+      }
+      // Serial3.println("Z");   //Start ---> request to ESP
+      // Serial.println("Z trigger sent");    
+      delay(1000);
+    } 
 }
 ////////////////////////////////////////////////////////////////////////////////
 void update_led_status(){
