@@ -68,7 +68,7 @@ const char* rootCACertificate = \
 
 bool Send_trigger = false;
 bool state = HIGH;
-bool send_response = false;
+int send_response = 0;
 
 String web_sequence = "";   //"0:0:0:0:0:0:0:0:0:0:0:0:&"
 bool Unlock_doors_keep_food[] = {false,false,false,false,false,false,false,false,false,false,false,false};
@@ -123,7 +123,7 @@ void setup(){
 	while ((WiFiMulti.run() != WL_CONNECTED)) {
 	Serial.print(".");
 	}
-	Serial.println(" connected");
+	// Serial.println(" connected");
 
 	// setClock();  
 
@@ -152,7 +152,7 @@ void loop(){
 				push_web_status = false;
 				Serial2.flush();
 				digitalWrite(LED, HIGH);		
-				Serial.println("Samll s trigger!!!!!!!");
+				// Serial.println("Samll s trigger!!!!!!!");
 			}
 		}	
 	}
@@ -162,11 +162,11 @@ void loop(){
 		delay(polling_time);
 		Get_web_Status();
 		if(send_response){  //Sending response to Master Controller
-			Serial.println("Sending Response to Master");
+			// Serial.println("Sending Response to Master");
 			////Unlocking doors here////////////////////////////////////////////////	
 			for(int i=0; i<box_count; i++){
 				if(Unlock_doors_keep_food[i]){
-					Serial.println("Keep Food!!");
+					// Serial.println("Keep Food!!");
 					if(i == 0) Serial2.println("A");
 					else if(i == 1) Serial2.println("B");
 					else if(i == 2) Serial2.println("C");
@@ -181,7 +181,7 @@ void loop(){
 					else if(i == 11) Serial2.println("L");
 				}
 				else if(Unlock_doors_Collect_food[i]){
-					Serial.println("Collect Food >>>>>>>>>");
+					// Serial.println("Collect Food >>>>>>>>>");
 					if(i == 0) Serial2.println("a");
 					else if(i == 1) Serial2.println("b");
 					else if(i == 2) Serial2.println("c");
@@ -244,7 +244,7 @@ void Get_web_Status(){
 	    https.end();
 	  }
 	  // Use https://arduinojson.org/v6/assistant to compute the capacity.
-	  const size_t capacity = 3072; //JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
+	  const size_t capacity = 3072; //JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;   //3072
 	  DynamicJsonDocument doc(capacity);
 
 	  // Parse JSON object
@@ -277,13 +277,14 @@ void Get_web_Status(){
 	    		else {Unlock_doors_keep_food[index] = false; Unlock_doors_Collect_food[index] = true;}
 
 	    		if(!response_sent[index]){
-	    			send_response = true;
+	    			send_response++;
 	    			response_sent[index] = true;
 	    		}
 	    	}
 	    	else{
 	    		Unlock_doors_keep_food[index] = false;
 	    		Unlock_doors_Collect_food[index] = false;
+	    		// response_sent[index] = false;
 	    	}
 	    }
 	    index++;
@@ -295,72 +296,71 @@ void Get_web_Status(){
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void update_response(){
-	int index = 0;
+void SerializeJsonDoc( int i){
+	StaticJsonDocument<200> sensor;    //192
+	String sensor_json;
+
+	sensor["locker_id"] = "641d35fb29dd881c34916f30"; 
+	sensor["ip_address"] = box_ip;
+	sensor["locker_box_id"] = locker_box_ids[i];
+	JsonObject properties = sensor.createNestedObject("properties");
+	properties["is_locked"] = response_is_locked[i];
+	properties["is_occupied"] = response_is_Occupied[i];
+	properties["temp_below_threshold"] = response_temp_threshold[i];
+	//i = box_count; // force terminating loop here <<<<<<<<<<-------------------------
+	update_boxes[i] = false;
+
+	serializeJson(sensor, sensor_json);
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// configure traged server and url
 	WiFiClientSecure *client = new WiFiClientSecure;
 	if(client) {
-	client -> setCACert(rootCACertificate);
-	HTTPClient https;
+		client -> setCACert(rootCACertificate);
+		HTTPClient https;
 
-	{
-	  String line; 
-	  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		{
+		  String line; 
+		  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		}
+		
+		https.begin(*client, put_link); //HTTPS
+		https.addHeader("x-api-key", "oplpsOtoCt2b1tyztPsKO233c5w6qi3Mx0B8rsCb");
+		https.addHeader("Content-Type", "application/json");
+		https.addHeader("Accept","application/json");
+		// start connection and send HTTP header and body
+		int httpCode = https.PUT(String(sensor_json));
+
+		// httpCode will be negative on error
+		if (httpCode > 0) {
+			// HTTP header has been send and Server response header has been handled
+
+			// file found at server
+			if (httpCode == HTTP_CODE_OK) {
+				const String& payload = https.getString();
+				response_sent[i] = false;
+				send_response--;
+				if(send_response<0) send_response=0;
+				// index = 999;
+			}
+		} 
+		https.end();
+	  delete client;
 	}
-	{
-	  ///////////////////////////posting data here//////////////////////////////////////////////
-	  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	  //JSON CREATION
-	  // char json[] = "{\"locker_id\": \"6418065f4fbb671f149c0823\", \"ip_address\": \"222.444.111.333\", \"locker_box_id\": \"6418065f4fbb671f149c0828\", \"properties\":{\"is_locked\": true, \"is_occupied\": false, \"temp_below_threshold\": true}}";
-	  
-	  for(int i=0; i<box_count; i++){
-
-	  	if(update_boxes[i]){
-	  		StaticJsonDocument<192> sensor;
-			  String sensor_json;
-
-			  sensor["locker_id"] = "641d35fb29dd881c34916f30"; 
-			  sensor["ip_address"] = box_ip;
-	  		sensor["locker_box_id"] = locker_box_ids[i];
-	  		JsonObject properties = sensor.createNestedObject("properties");
-	  		properties["is_locked"] = response_is_locked[i];
-	  		properties["is_occupied"] = response_is_Occupied[i];
-	  		properties["temp_below_threshold"] = response_temp_threshold[i];
-	  		//i = box_count; // force terminating loop here <<<<<<<<<<-------------------------
-	  		update_boxes[i] = false;
-	  		index = i;
-
-	  		serializeJson(sensor, sensor_json);
-			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			// configure traged server and url
-			https.begin(*client, put_link); //HTTPS
-			https.addHeader("x-api-key", "oplpsOtoCt2b1tyztPsKO233c5w6qi3Mx0B8rsCb");
-			https.addHeader("Content-Type", "application/json");
-			https.addHeader("Accept","application/json");
-			// start connection and send HTTP header and body
-			int httpCode = https.PUT(String(sensor_json));
-
-			// httpCode will be negative on error
-			if (httpCode > 0) {
-				// HTTP header has been send and Server response header has been handled
-
-				// file found at server
-				if (httpCode == HTTP_CODE_OK) {
-					const String& payload = https.getString();
-					response_sent[index] = false;
-					index = 999;
-				}
-			} 
-			https.end();
-			//////////////////////////////////////////////////////////////////////////////////////////
-	  	}
+	//////////////////////////////////////////////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void update_response(){
+	int index=0;
+	for(int i=0; i<box_count; i++){
+  	if(update_boxes[i]){
+  		SerializeJsonDoc(i);
 	  }
 	}
-	delete client;
-	}
 
-	for(int i=0, index=0; i<box_count; i++){
-		if(response_sent[i]) index--;
-		else index++;		
-	}
-	if(index == box_count) send_response = false;
+	// for(int i=0, index=0; i<box_count; i++){
+	// 	if(response_sent[i]) index--;
+	// 	else index++;		
+	// }
+	// if(index == box_count) send_response = false;
 }

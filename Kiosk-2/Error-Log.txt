@@ -1,0 +1,174 @@
+connected
+Waiting for NTP time sync: .....
+Current time: Sat Apr 22 19:30:40 2023
+Connecting to https://locker-api.versicles.com/locker/641d35fb29dd881c34916f30.json
+[HTTPS] begin...
+[HTTPS] GET...
+[HTTPS] GET... code: 200
+{"id": "641d35fb29dd881c34916f30", "name": "lulu locker 2", "locker_boxes": [{"id": "641d35fc29dd881c34916f31", "number": 1, "is_locked": true, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f32", "number": 2, "is_locked": true, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f33", "number": 3, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "644315952b2f179b2fa04326", "customer": {"name": "Abhishek ", "phone": "+916265373572"}}}, {"id": "641d35fc29dd881c34916f34", "number": 4, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "64430b681d3946fca5a5b836", "customer": {"name": "Abhi", "phone": "+916265373572"}}}, {"id": "641d35fc29dd881c34916f35", "number": 5, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f36", "number": 6, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "644347fed10e6c72000e06d9", "customer": {"name": "Dfgh", "phone": "+916265373572"}}}, {"id": "641d35fc29dd881c34916f37", "number": 7, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f38", "number": 8, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f39", "number": 9, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "64432554d1ab6e0feffe4663", "customer": {"name": "Abhi", "phone": "+916265373572"}}}, {"id": "641d35fc29dd881c34916f3a", "number": 10, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f3b", "number": 11, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f3c", "number": 12, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "64432889ca20e8319ac97ed3", "customer": {"name": "H", "phone": "+916265373572"}}}]}
+Device ID matched successfully!
+Reply was:
+==========
+{"id": "641d35fb29dd881c34916f30", "name": "lulu locker 2", "locker_boxes": [{"id": "641d35fc29dd881c34916f31", "number": 1, "is_locked": true, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f32", "number": 2, "is_locked": true, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f33", "number": 3, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "644315952b2f179b2fa04326", "customer": {"name": "Abhishek ", "phone": "+916265373572"}}}, {"id": "641d35fc29dd881c34916f34", "number": 4, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "64430b681d3946fca5a5b836", "customer": {"name": "Abhi", "phone": "+916265373572"}}}, {"id": "641d35fc29dd881c34916f35", "number": 5, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f36", "number": 6, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "644347fed10e6c72000e06d9", "customer": {"name": "Dfgh", "phone": "+916265373572"}}}, {"id": "641d35fc29dd881c34916f37", "number": 7, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f38", "number": 8, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f39", "number": 9, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "64432554d1ab6e0feffe4663", "customer": {"name": "Abhi", "phone": "+916265373572"}}}, {"id": "641d35fc29dd881c34916f3a", "number": 10, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f3b", "number": 11, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": null}, {"id": "641d35fc29dd881c34916f3c", "number": 12, "is_locked": false, "is_occupied": false, "temp_below_threshold": false, "order": {"locker_box_content_id": "64432889ca20e8319ac97ed3", "customer": {"name": "H", "phone": "+916265373572"}}}]}
+==========
+Closing connection
+Parsing Json from here ----------------------------->
+#################################################################
+locker_id =641d35fb29dd881c34916f30
+locker_name =lulu locker 2
+#################################################################
+locker_id =641d35fb29dd881c34916f30
+locker_name =lulu locker 2
+#################################################################
+box_id =641d35fc29dd881c34916f31
+box_no =1
+box_is_locked =1
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:
+box order customer name:
+box order customer phone:
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f32
+box_no =2
+box_is_locked =1
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:
+box order customer name:
+box order customer phone:
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f33
+box_no =3
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:644315952b2f179b2fa04326
+box order customer name:Abhishek 
+box order customer phone:+916265373572
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f34
+box_no =4
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:64430b681d3946fca5a5b836
+box order customer name:Abhi
+box order customer phone:+916265373572
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f35
+box_no =5
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:
+box order customer name:
+box order customer phone:
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f36
+box_no =6
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:644347fed10e6c72000e06d9
+box order customer name:Dfgh
+box order customer phone:+916265373572
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f37
+box_no =7
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:
+box order customer name:
+box order customer phone:
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f38
+box_no =8
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:
+box order customer name:
+box order customer phone:
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f39
+box_no =9
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:64432554d1ab6e0feffe4663
+box order customer name:Abhi
+box order customer phone:+916265373572
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f3a
+box_no =10
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:
+box order customer name:
+box order customer phone:
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f3b
+box_no =11
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:
+box order customer name:
+box order customer phone:
+---------------------------------------------------------------
+box_id =641d35fc29dd881c34916f3c
+box_no =12
+box_is_locked =0
+box_is_occupied =0
+box_temp_below_threshold =0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+box order id:64432889ca20e8319ac97ed3
+box order customer name:H
+box order customer phone:+916265373572
+---------------------------------------------------------------
+Connecting to https://locker-iot-api.versicles.com/locker-box
+Starting JSON Creation
+Data pushed...
+Data pushed...
+Data pushed...
+Data pushed...
+Data pushed...
+
+Waiting 60s before the next round..
+
+-----------------------------------------------------------------------------------
+
+connected
+Samll s trigger!!!!!!!
+Sending Response to Master
+Keep Food!!
+Guru Meditation Error: Core  1 panic'ed (LoadProhibited). Exception was unhandled.
+
+Core  1 register dump:
+PC      : 0x400d41cc  PS      : 0x00060f30  A0      : 0x800d473b  A1      : 0x3ffb1fa0  
+A2      : 0x3ffb2160  A3      : 0x0000005d  A4      : 0x3ffc49c4  A5      : 0x00000000  
+A6      : 0x3ffc451c  A7      : 0x3ffb2218  A8      : 0x00000001  A9      : 0x01010101  
+A10     : 0x3ffb2188  A11     : 0x01010101  A12     : 0x3ffb2218  A13     : 0x3ffc49b4  
+A14     : 0x3f416509  A15     : 0x00000001  SAR     : 0x00000019  EXCCAUSE: 0x0000001c  
+EXCVADDR: 0x01010101  LBEG    : 0x4008a4c5  LEND    : 0x4008a4d5  LCOUNT  : 0xfffffffd  
+
+
+Backtrace: 0x400d41c9:0x3ffb1fa0 0x400d4738:0x3ffb2270 0x400db809:0x3ffb2290
+
+ELF file SHA256: 3e5e9330cfd32de0
+
+Rebooting...
