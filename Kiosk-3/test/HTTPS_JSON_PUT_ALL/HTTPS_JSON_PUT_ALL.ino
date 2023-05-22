@@ -5,6 +5,8 @@
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 
+#define box_count 12
+
 /*#ifndef STASSID
 #define STASSID "BSNL-FTTH-1908"
 #define STAPSK  "vtk2361908"
@@ -22,7 +24,14 @@
 
 #define get_link "https://locker-api.versicles.com/locker/641d35fb29dd881c34916f30.json"  //Update this link for different lockers
 #define parse_check "{\"id\": \"641d35fb29dd881c34916f30\""                               //update this json response for every locker
-#define put_link "https://locker-iot-api.versicles.com/locker-box"                        //Update this link for different lockers
+#define put_link "https://locker-iot-api.versicles.com/locker-box"
+
+String locker_box_ids[] ={"641d35fc29dd881c34916f31","641d35fc29dd881c34916f32","641d35fc29dd881c34916f33","641d35fc29dd881c34916f34","641d35fc29dd881c34916f35","641d35fc29dd881c34916f36","641d35fc29dd881c34916f37","641d35fc29dd881c34916f38","641d35fc29dd881c34916f39","641d35fc29dd881c34916f3a","641d35fc29dd881c34916f3b","641d35fc29dd881c34916f3c"};                        //Update this link for different lockers
+bool response_is_locked[] =  {true, true, true, true, true, true, true, true, true, true, true, true};
+// bool response_is_Occupied[] = {true, true, true, true, true, true, true, true, true, true, true, true};
+bool response_is_Occupied[] = {false,false,false,false,false,false,false,false,false,false, false, false};
+bool response_temp_threshold[] = {false,false,false,false,false,false,false,false,false,false, false, false};
+bool update_boxes[] = {false,false,false,false,false,false,false,true,false,true, true, false};
 //////////////////////////////////////////////////////////////////////////////
 const char* put_host = "https://locker-iot-api.versicles.com";
 const uint16_t port = 443;
@@ -204,7 +213,6 @@ void loop() {
     }
     {
       ///////////////////////////posting data here//////////////////////////////////////////////
-
       // Use WiFiClientSecure class to create TLS connection
       Serial.print("Connecting to ");
       Serial.println(put_link);
@@ -214,50 +222,49 @@ void loop() {
       Serial.println("Starting JSON Creation");
       // char json[] = "{\"locker_id\": \"6418065f4fbb671f149c0823\", \"ip_address\": \"222.444.111.333\", \"locker_box_id\": \"6418065f4fbb671f149c0828\", \"properties\":{\"is_locked\": true, \"is_occupied\": false, \"temp_below_threshold\": true}}";
       
+      for(int i=0; i<box_count; i++){
+
       StaticJsonDocument<192> sensor;
       String sensor_json;
-
       sensor["locker_id"] = "641d35fb29dd881c34916f30"; 
       sensor["ip_address"] = "111.333.444.555";
-      sensor["locker_box_id"] = "641d35fc29dd881c34916f3c";
 
-      JsonObject properties = sensor.createNestedObject("properties");
-      properties["is_locked"] = true;
-      properties["is_occupied"] = false;
-      properties["temp_below_threshold"] = false;
+      if(update_boxes[i]){
+        sensor["locker_box_id"] = locker_box_ids[i];
+        JsonObject properties = sensor.createNestedObject("properties");
+        properties["is_locked"] = response_is_locked[i];
+        properties["is_occupied"] = response_is_Occupied[i];
+        properties["temp_below_threshold"] = response_temp_threshold[i];
+        //i = box_count; // force terminating loop here <<<<<<<<<<-------------------------
+        update_boxes[i] = false;
 
-      serializeJson(sensor, sensor_json);
-      Serial.print("sensor_json= ");
-      Serial.println(sensor_json);
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      Serial.print("[HTTPS] begin...\n");
-      // configure traged server and url
-      https.begin(*client, put_link); //HTTPS
-      https.addHeader("x-api-key", "oplpsOtoCt2b1tyztPsKO233c5w6qi3Mx0B8rsCb");
-      https.addHeader("Content-Type", "application/json");
-      https.addHeader("Accept","application/json");
-      Serial.print("[HTTPS] PUT...\n");
-      // start connection and send HTTP header and body
-      int httpCode = https.PUT(String(sensor_json));
-
-      // httpCode will be negative on error
-      if (httpCode > 0) {
-        // HTTP header has been send and Server response header has been handled
-        Serial.printf("[HTTPS] PUT... code: %d\n", httpCode);
-
-        // file found at server
-        if (httpCode == HTTP_CODE_OK) {
-          const String& payload = https.getString();
-          Serial.println("received payload:\n<<");
-          Serial.println(payload);
-          Serial.println(">>");
-        }
-      } else {
-        Serial.printf("[HTTPS] PUT... failed, error: %s\n", https.errorToString(httpCode).c_str());
+        serializeJson(sensor, sensor_json);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // configure traged server and url
+        https.begin(*client, put_link); //HTTPS
+        https.addHeader("x-api-key", "oplpsOtoCt2b1tyztPsKO233c5w6qi3Mx0B8rsCb");
+        https.addHeader("Content-Type", "application/json");
+        https.addHeader("Accept","application/json");
+        // start connection and send HTTP header and body
+        int httpCode = https.PUT(String(sensor_json));
+        Serial.print("Pushing JSON ->>>>  ");
+        Serial.println(String(sensor_json));
+        // httpCode will be negative on error
+        if (httpCode > 0) {
+          // HTTP header has been send and Server response header has been handled
+          if(httpCode == 200) {Serial.println("Data pushed...");}
+          // file found at server
+          if (httpCode == HTTP_CODE_OK) {
+            const String& payload = https.getString();
+            Serial.print("Payload: ");
+            Serial.println(payload);
+          }
+        } 
+        https.end();
+        //////////////////////////////////////////////////////////////////////////////////////////
       }
-
-      https.end();
+      delay(7000);
+    }
       //////////////////////////////////////////////////////////////////////////////////////////
     }
     delete client;

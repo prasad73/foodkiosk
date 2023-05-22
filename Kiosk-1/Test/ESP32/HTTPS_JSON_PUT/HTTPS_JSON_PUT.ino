@@ -10,15 +10,15 @@
 #define STAPSK  "vtk2361908"
 #endif*/
 
-// #ifndef STASSID
-// #define STASSID "Rapid-Abhi"
-// #define STAPSK  "Rapidcode12"
-// #endif
-
 #ifndef STASSID
-#define STASSID "Nokia C01 Plus"
-#define STAPSK  "versicles123"
+#define STASSID "Rapid-Abhi"
+#define STAPSK  "Rapidcode12"
 #endif
+
+// #ifndef STASSID
+// #define STASSID "Nokia C01 Plus"
+// #define STAPSK  "versicles123"
+// #endif
 
 #define get_link "https://locker-api.versicles.com/locker/6418065f4fbb671f149c0823.json"  //Update this link for different lockers
 #define parse_check "{\"id\": \"6418065f4fbb671f149c0823\""                               //update this json response for every locker
@@ -77,7 +77,7 @@ WiFiMulti WiFiMulti;
 //////////////////////////////////////////////////////////////////////////////
 void setup() {
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   // Serial.setDebugOutput(true);
 
   Serial.println();
@@ -219,7 +219,7 @@ void loop() {
 
       sensor["locker_id"] = "6418065f4fbb671f149c0823"; 
       sensor["ip_address"] = "111.222.333.444";
-      sensor["locker_box_id"] = "6418065f4fbb671f149c082c";
+      sensor["locker_box_id"] = "6418065f4fbb671f149c0824";
 
       JsonObject properties = sensor.createNestedObject("properties");
       properties["is_locked"] = true;

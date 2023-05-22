@@ -1,3 +1,17 @@
+JSON API : 
+https://locker-api.versicles.com/locker/ID.json
+
+Link: 
+https://locker.versicles.com/locker/ID
+
+Locker ID's: 
+Lulu 1st Locker: 6418065f4fbb671f149c0823
+Lulu 2nd Locker: 641d35fb29dd881c34916f30
+Lulu 3rd Locker: 641d369629dd881c34916f3d
+
+
+
+
 Please find the Locker Trigger Workflow
 -----------------------------------------------------------------------------------------------
 Default Status:
