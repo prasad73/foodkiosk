@@ -6,8 +6,8 @@
 #define lock6 32
 #define lock7 34
 #define lock8 36
-#define lock9 44
-#define lock10 40
+#define lock9 40
+#define lock10 44
 #define lock11 42
 #define lock12 12
 
@@ -19,7 +19,7 @@
 #define lock6F A9
 #define lock7F A10
 #define lock8F A11
-#define lock9F A12
+#define lock9F 41
 #define lock10F A13
 #define lock11F A14
 #define lock12F A15

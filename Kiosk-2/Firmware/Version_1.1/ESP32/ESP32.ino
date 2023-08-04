@@ -77,8 +77,8 @@ bool Unlock_doors_Collect_food[] = {false,false,false,false,false,false,false,fa
 bool response_is_locked[] =  {true, true, true, true, true, true, true, true, true, true, true, true};
 bool response_is_Occupied[] = {false,false,false,false,false,false,false,false,false,false,false,false};
 bool response_temp_threshold[] = {false,false,false,false,false,false,false,false,false,false,false,false};
-bool update_boxes[] = {false,false,false,false,false,false,false,false,false,false,false};
-bool response_sent[] = {false,false,false,false,false,false,false,false,false,false,false};
+bool update_boxes[] = {false,false,false,false,false,false,false,false,false,false,false,false};
+bool response_sent[] = {false,false,false,false,false,false,false,false,false,false,false,false};
 
 bool push_web_status = true;
 

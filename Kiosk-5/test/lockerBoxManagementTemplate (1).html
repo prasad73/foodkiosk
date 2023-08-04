@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locker Boxes Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #882C88;
+            background-image: url("background.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container h1 {
+            margin: 15px 5px 5px 5px;
+        }
+
+        .logo {
+            /* position: absolute; */
+            background: url("https://versicles-strapi-media.s3.ap-south-1.amazonaws.com/vendngo_internallogo_f228223dff.png") no-repeat;
+            height: 56px;
+            width: 264px;
+            /* left: 50%; */
+            /* transform: translateX(-50%); */
+            margin: auto;
+        }
+
+        .footer_logo {
+            /* position: absolute; */
+            background: url("https://versicles-strapi-media.s3.ap-south-1.amazonaws.com/footer_Logointernal_1422be5a5a.png") no-repeat;
+            width: 77.04px;
+            height: 77.04px;
+
+        }
+
+        .toggle_container {
+            display: flex;
+            font-size: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .toggle_label {
+            margin-right: 2px;
+			color: white;
+        }
+
+        .locker-container {
+            width: 300px;
+            margin: auto;
+            margin-top: 5px;
+        }
+
+        .locker-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .settings-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .settings-modal {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-modal input {
+            display: block;
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .settings-modal button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #882c88;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* The switch - the box around the slider */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 20px;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(18px);
+            -ms-transform: translateX(18px);
+            transform: translateX(18px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        .locker_item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #c2c2c2;
+            width: 90px;
+        }
+
+        .item_toggle_label {
+            margin: 0;
+            margin-right: 10px;
+            font-size: 20px;
+			color: white;
+
+        }
+
+        @media only screen and (max-width: 600px) {
+            .locker-box {
+                width: 50px;
+                height: 50px;
+                line-height: 50px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo"></div>
+        <h1 style="color: white;">Locker Boxes Management</h1>
+        <div class="toggle_container">
+            <p class="toggle_label">Toggle to Lock/Unlock all:</label>
+                <label class="switch">
+                    <input type="checkbox" checked id="toggle-all">
+                    <span class="slider round"></span>
+                </label>
+        </div>
+
+        <div class="locker-container" id="locker-container"></div>
+    </div>
+
+    <!-- Settings Icon -->
+    <div class="footer_logo settings-icon" onclick="toggleSettingsModal()"></div>
+
+    <!-- Settings Modal -->
+    <div class="settings-modal" id="settingsModal">
+        <input type="text" placeholder="SSID" id="ssidInput">
+        <input type="password" placeholder="Password" id="passwordInput">
+        <button onclick="submitSettings()">Submit</button>
+    </div>
+
+    <script>
+        function createLockerBoxes(numBoxes) {
+            const lockerContainer = document.getElementById("locker-container");
+            const rows = Math.ceil(numBoxes / 2);
+
+            for (let row = 0; row < rows; row++) {
+                const rowElement = document.createElement("div");
+                rowElement.className = "locker-row";
+
+                for (let col = 0; col < 2; col++) {
+                    const boxIndex = row * 2 + col;
+
+                    if (boxIndex >= numBoxes) {
+                        // If the boxIndex exceeds the number of boxes, exit the loop
+                        break;
+                    }
+
+                    const lockerBox = document.createElement("div");
+                    lockerBox.className = "locker_item";
+
+                    const lockerNumber = document.createElement("p");
+                    lockerNumber.className = "item_toggle_label";
+                    lockerNumber.innerText = boxIndex + 1;
+
+                    const colon = document.createElement("span");
+                    colon.className = "item_toggle_label";
+                    colon.innerText = ":";
+
+                    const toggleSwitch = document.createElement("label");
+                    toggleSwitch.className = "switch";
+
+                    const toggleInput = document.createElement("input");
+                    toggleInput.type = "checkbox";
+                    toggleInput.checked=true;
+                    toggleInput.id = "locker-" + boxIndex;
+                    toggleInput.addEventListener("change", function (event) {
+                        const index = parseInt(event.target.id.split("-")[1]);
+                        const isChecked = event.target.checked;
+                        console.log("Toggle switch at index", index + 1, "is now", isChecked ? "ON" : "OFF");
+                        // You can perform any action based on the toggle state here
+                    });
+
+                    const toggleSpan = document.createElement("span");
+                    toggleSpan.className = "slider round";
+                    toggleSwitch.appendChild(toggleInput);
+                    toggleSwitch.appendChild(toggleSpan);
+
+                    lockerBox.appendChild(lockerNumber);
+                    lockerBox.appendChild(colon);
+                    lockerBox.appendChild(toggleSwitch);
+                    rowElement.appendChild(lockerBox);
+                }
+
+                lockerContainer.appendChild(rowElement);
+            }
+        }
+
+
+
+        function toggleSettingsModal() {
+            const settingsModal = document.getElementById("settingsModal");
+            settingsModal.style.display = settingsModal.style.display === "block" ? "none" : "block";
+        }
+
+        function submitSettings() {
+            // Get the values from the input elements
+            const ssid = document.getElementById("ssidInput").value;
+            const password = document.getElementById("passwordInput").value;
+
+            // Log the values to the console
+            console.log("SSID:", ssid);
+            console.log("Password:", password);
+
+            // You can perform any other actions or validations here
+            // For demonstration purposes, we will just close the settings modal:
+            toggleSettingsModal();
+        }
+
+        function toggleAllLockers() {
+            const toggleAllCheckbox = document.getElementById("toggle-all");
+            const lockerBoxes = document.querySelectorAll(".locker_item");
+            for (const [index, lockerBox] of Array.from(lockerBoxes).entries()) {
+                if (toggleAllCheckbox.checked) {
+                    const toggleItemCheckbox = document.getElementById(`locker-${index}`);
+                    toggleItemCheckbox.checked = true
+                } else {
+                    const toggleItemCheckbox = document.getElementById(`locker-${index}`);
+
+                    toggleItemCheckbox.checked = false
+                }
+            }
+        }
+
+        document.getElementById("toggle-all").addEventListener("change", toggleAllLockers);
+
+        // Replace the number with the desired number of locker boxes (e.g., 6, 9, 12)
+        const numLockers = 6;
+        createLockerBoxes(numLockers);
+    </script>
+</body>
+
+</html>
