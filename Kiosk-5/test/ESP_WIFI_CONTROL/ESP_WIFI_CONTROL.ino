@@ -23,7 +23,7 @@ void setupAP(void);
 
 //Establishing Local server at port 80
 WebServer server(80);
-
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
 void setup()
 {
 
@@ -78,30 +78,10 @@ void setup()
   }
   delay(2000);
 }
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
 void loop() {
 
-  /*if ((WiFi.status() == WL_CONNECTED))
-  {
-
-    for (int i = 0; i < 10; i++)
-    {
-      Serial.print("Connected to ");
-      Serial.print(esid);
-      Serial.println(" Successfully");
-      delay(100);
-    }
-
-  }
-  else
-  {
-  }*/
-
-  if (testWifi() && (digitalRead(Switch) == 1))
-  {
-    Serial.println(" connection status positive");
-    return;
-  }
-  else
+  if(!(testWifi() && (digitalRead(Switch) == 1)))
   {
     unsigned long int start_time = millis();
     while(1){
@@ -111,7 +91,7 @@ void loop() {
       }
     }
     if(digitalRead(Switch) == 0){
-      Serial.println("Connection Status Negative / D15 HIGH");
+      // Serial.println("Connection Status Negative / D15 HIGH");
       Serial.println("Turning the HotSpot On");
       launchWeb();
       setupAP();// Setup HotSpot
@@ -128,7 +108,7 @@ void loop() {
     }
   }
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------- Fuctions used for WiFi credentials saving and connecting to it which you do not need to change
 bool testWifi(void)
@@ -148,7 +128,7 @@ bool testWifi(void)
   Serial.println("Connect timed out, opening AP");
   return false;
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
 void launchWeb()
 {
   Serial.println("");
@@ -163,55 +143,7 @@ void launchWeb()
   server.begin();
   Serial.println("Server started");
 }
-
-void setupAP(void)
-{
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(100);
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  if (n == 0)
-    Serial.println("no networks found");
-  else
-  {
-    Serial.print(n);
-    Serial.println(" networks found");
-    for (int i = 0; i < n; ++i)
-    {
-      // Print SSID and RSSI for each network found
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(WiFi.SSID(i));
-      Serial.print(" (");
-      Serial.print(WiFi.RSSI(i));
-      Serial.print(")");
-      //Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*");
-      delay(10);
-    }
-  }
-  Serial.println("");
-  st = "<ol>";
-  for (int i = 0; i < n; ++i)
-  {
-    // Print SSID and RSSI for each network found
-    st += "<li>";
-    st += WiFi.SSID(i);
-    st += " (";
-    st += WiFi.RSSI(i);
-
-    st += ")";
-    //st += (WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*";
-    st += "</li>";
-  }
-  st += "</ol>";
-  delay(100);
-  WiFi.softAP("Kiosk-645*2c6", "");
-  Serial.println("Initializing_softap_for_wifi credentials_modification");
-  launchWeb();
-  Serial.println("over");
-}
-
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
 void createWebServer()
 {
   {
@@ -280,3 +212,52 @@ void createWebServer()
     });
   }
 }
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
+void setupAP(void)
+{
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0)
+    Serial.println("no networks found");
+  else
+  {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i)
+    {
+      // Print SSID and RSSI for each network found
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.print(")");
+      //Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*");
+      delay(10);
+    }
+  }
+  Serial.println("");
+  st = "<ol>";
+  for (int i = 0; i < n; ++i)
+  {
+    // Print SSID and RSSI for each network found
+    st += "<li>";
+    st += WiFi.SSID(i);
+    st += " (";
+    st += WiFi.RSSI(i);
+
+    st += ")";
+    //st += (WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*";
+    st += "</li>";
+  }
+  st += "</ol>";
+  delay(100);
+  WiFi.softAP("Kiosk-645*2c6", "");
+  Serial.println("Initializing_softap_for_wifi credentials_modification");
+  launchWeb();
+  Serial.println("over");
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
