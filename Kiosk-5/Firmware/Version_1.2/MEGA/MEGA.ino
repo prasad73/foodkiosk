@@ -62,6 +62,7 @@ int box_Status[Boxes];           // Box state from web stored here
 int data_tracker = 0 ;           // tracker to check whether all data is received or not
 bool data_recieved = false;      // data-received from ESP8266/ESP32 or not
 unsigned long SendTriggerTime;   // Used to check trigger command duration
+bool Internet_Connected = false;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool door_lock_state[Boxes] = {false, false, false, false, false, false};
 bool food_present_state[Boxes] = {false, false, false, false, false, false};
@@ -143,6 +144,7 @@ void setup(){
   update_state();
   Serial.println("updating web state");
   update_Web_Status();
+  Internet_Connected = true;
   Serial.println("updating led state");
   update_led_status();
   Serial.println("Inside Loop..");
@@ -167,15 +169,16 @@ void loop(){
 
 		if(command == 'A'){//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			web_door_status[0] = true;
-				if(door_lock_state[0] == false){
-					digitalWrite(lock1, HIGH);
-					Serial.println("Lock1 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door1 already open");
-				}
-				digitalWrite(lock1, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[0] == false){
+				digitalWrite(lock1, HIGH);
+				Serial.println("Lock1 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door1 already open");
+			}
+			digitalWrite(lock1, LOW);
 
 			//////////////////////////
 			//update door state
@@ -184,15 +187,16 @@ void loop(){
 		}
 		else if(command == 'B'){//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			web_door_status[1] = true;
-				if(door_lock_state[1] == false){
-					digitalWrite(lock2, HIGH);
-					Serial.println("Lock2 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door2 already open");
-				}
-				digitalWrite(lock2, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[1] == false){
+				digitalWrite(lock2, HIGH);
+				Serial.println("Lock2 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door2 already open");
+			}
+			digitalWrite(lock2, LOW);
 
 			//////////////////////////
 			//update door state
@@ -201,15 +205,16 @@ void loop(){
 		}
 		else if(command == 'C'){//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			web_door_status[2] = true;
-				if(door_lock_state[2] == false){
-					digitalWrite(lock3, HIGH);
-					Serial.println("Lock3 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door3 already open");
-				}
-				digitalWrite(lock3, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[2] == false){
+				digitalWrite(lock3, HIGH);
+				Serial.println("Lock3 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door3 already open");
+			}
+			digitalWrite(lock3, LOW);
 
 			//////////////////////////
 			//update door state
@@ -218,15 +223,16 @@ void loop(){
 		}
 		else if(command == 'D'){//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			web_door_status[3] = true;
-				if(door_lock_state[3] == false){
-					digitalWrite(lock4, HIGH);
-					Serial.println("Lock4 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door4 already open");
-				}
-				digitalWrite(lock4, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[3] == false){
+				digitalWrite(lock4, HIGH);
+				Serial.println("Lock4 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door4 already open");
+			}
+			digitalWrite(lock4, LOW);
 
 			//////////////////////////
 			//update door state
@@ -235,15 +241,16 @@ void loop(){
 		}
 		else if(command == 'E'){//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			web_door_status[4] = true;
-				if(door_lock_state[4] == false){
-					digitalWrite(lock5, HIGH);
-					Serial.println("Lock5 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door5 already open");
-				}
-				digitalWrite(lock5, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[4] == false){
+				digitalWrite(lock5, HIGH);
+				Serial.println("Lock5 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door5 already open");
+			}
+			digitalWrite(lock5, LOW);
 
 			//////////////////////////
 			//update door state
@@ -252,15 +259,16 @@ void loop(){
 		}
 		else if(command == 'F'){//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			web_door_status[5] = true;
-				if(door_lock_state[5] == false){
-					digitalWrite(lock6, HIGH);
-					Serial.println("Lock6 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door6 already open");
-				}
-				digitalWrite(lock6, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[5] == false){
+				digitalWrite(lock6, HIGH);
+				Serial.println("Lock6 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door6 already open");
+			}
+			digitalWrite(lock6, LOW);
 
 			//////////////////////////
 			//update door state
@@ -269,15 +277,16 @@ void loop(){
 		}
 		else if(command == 'a'){
 			web_door_status[0] = false;
-				if(door_lock_state[0] == false){
-					digitalWrite(lock1, HIGH);
-					Serial.println("Lock1 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door1 already open");
-				}
-				digitalWrite(lock1, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[0] == false){
+				digitalWrite(lock1, HIGH);
+				Serial.println("Lock1 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door1 already open");
+			}
+			digitalWrite(lock1, LOW);
 
 			//////////////////////////
 			//update door state
@@ -286,15 +295,16 @@ void loop(){
 		}
 		else if(command == 'b'){
 			web_door_status[1] = false;
-				if(door_lock_state[1] == false){
-					digitalWrite(lock2, HIGH);
-					Serial.println("Lock2 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door2 already open");
-				}
-				digitalWrite(lock2, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[1] == false){
+				digitalWrite(lock2, HIGH);
+				Serial.println("Lock2 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door2 already open");
+			}
+			digitalWrite(lock2, LOW);
 
 			//////////////////////////
 			//update door state
@@ -303,15 +313,16 @@ void loop(){
 		}
 		else if(command == 'c'){
 			web_door_status[2] = false;
-				if(door_lock_state[2] == false){
-					digitalWrite(lock3, HIGH);
-					Serial.println("Lock3 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door3 already open");
-				}
-				digitalWrite(lock3, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[2] == false){
+				digitalWrite(lock3, HIGH);
+				Serial.println("Lock3 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door3 already open");
+			}
+			digitalWrite(lock3, LOW);
 
 			//////////////////////////
 			//update door state
@@ -320,15 +331,16 @@ void loop(){
 		}
 		else if(command == 'd'){
 			web_door_status[3] = false;
-				if(door_lock_state[3] == false){
-					digitalWrite(lock4, HIGH);
-					Serial.println("Lock4 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door4 already open");
-				}
-				digitalWrite(lock4, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[3] == false){
+				digitalWrite(lock4, HIGH);
+				Serial.println("Lock4 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door4 already open");
+			}
+			digitalWrite(lock4, LOW);
 
 			//////////////////////////
 			//update door state
@@ -337,15 +349,16 @@ void loop(){
 		}
 		else if(command == 'e'){
 			web_door_status[4] = false;
-				if(door_lock_state[4] == false){
-					digitalWrite(lock5, HIGH);
-					Serial.println("Lock5 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door5 already open");
-				}
-				digitalWrite(lock5, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[4] == false){
+				digitalWrite(lock5, HIGH);
+				Serial.println("Lock5 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door5 already open");
+			}
+			digitalWrite(lock5, LOW);
 
 			//////////////////////////
 			//update door state
@@ -354,27 +367,36 @@ void loop(){
 		}
 		else if(command == 'f'){
 			web_door_status[5] = false;
-				if(door_lock_state[5] == false){
-					digitalWrite(lock6, HIGH);
-					Serial.println("Lock6 Unlocked");
-					delay(drive_time);
-				}
-				else{
-					Serial.println("Door6 already open");
-				}
-				digitalWrite(lock6, LOW);
+			Internet_Connected = true;
+			if(door_lock_state[5] == false){
+				digitalWrite(lock6, HIGH);
+				Serial.println("Lock6 Unlocked");
+				delay(drive_time);
+			}
+			else{
+				Serial.println("Door6 already open");
+			}
+			digitalWrite(lock6, LOW);
 
 			//////////////////////////
 			//update door state
 			door_lock_state[5] = true; 
 			//////////////////////////
 		}
+		else if(command == 'X'){
+		for(int i=0; i<strip4.numPixels(); i++) { // For each pixel in strip...
+		    strip4.setPixelColor(i, 0);         //  Set pixel's color (in RAM)
+		    strip4.show();                          //  Update strip to match
+		    delay(1);                           //  Pause for a moment
+		 }
+		Internet_Connected = false;
+		}
 		command = '#';
 	}
 	///////////////////////////////////////////////////////////////////////////////////
-	update_state();
+	if(Internet_Connected )update_state();
 	///////////////////////////////////////////////////////////////////////////////////
-	update_led_status();
+	if(Internet_Connected) update_led_status();
 	//##################################################################################################################################################################
 
 }
@@ -916,7 +938,7 @@ void update_led_status(){
       }
       if(door_lock_state[5]) update_column1(3, 2);
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
+
   //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ///////////////////////////////////////////////////////////////////////////////////
 }

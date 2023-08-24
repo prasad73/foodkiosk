@@ -1,47 +1,43 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <WiFiMulti.h>
+// #include <WiFiMulti.h>
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
+#include <WebServer.h>
+#include <EEPROM.h>
 
 #define LED 2
 #define RXD2 16
 #define TXD2 17
-#define box_count 12
+#define box_count 6
+#define Switch 23
 
-#define box_ip "111.333.444.555"
+#define box_ip "192.178.678.555"
 #define polling_time 2000
 
-// #ifndef STASSID
-// #define STASSID "verifygn"
-// #define STAPSK  "verifygn@2020"
-// #endif
-
-#ifndef STASSID
-#define STASSID "BSNL-FTTH-1908"
-#define STAPSK  "vtk2361908"
-#endif
-
-// #ifndef STASSID
-// #define STASSID "Rapid-Abhi"
-// #define STAPSK  "Rapidcode12"
-// #endif
-/*
 #ifndef STASSID
 #define STASSID "Vendigo-3"
 #define STAPSK  "versicles123"
 #endif
-*/
-#define get_link "https://locker-api.versicles.com/locker/641d369629dd881c34916f3d.json"  //Update this link for different lockers
-#define parse_check "{\"id\": \"641d369629dd881c34916f3d\""                               //update this json response for every locker
+
+
+#define get_link "https://locker-api.versicles.com/locker/645e48406dd4d02438dea2c6.json"  //Update this link for different lockers
+#define parse_check "{\"id\": \"645e48406dd4d02438dea2c6\""                               //update this json response for every locker
 #define put_link "https://locker-iot-api.versicles.com/locker-box"                        //Update this link for different lockers
+//////////////////////////////////////////////////////////////////////////////
+//Variables
+int i = 0;
+int statusCode;
+const char* ssid = STASSID;
+const char* passphrase = STAPSK;
+String st;
+String content;
+String esid;
+String epass = "";
 //////////////////////////////////////////////////////////////////////////////
 const char* put_host = "https://locker-iot-api.versicles.com";
 const uint16_t port = 443;
-
-const char* ssid = STASSID;
-const char* password = STAPSK;
 //////////////////////////////////////////////////////////////////////////////
 const char* rootCACertificate = \
 "-----BEGIN CERTIFICATE-----\n" \
@@ -65,27 +61,31 @@ const char* rootCACertificate = \
 "rqXRfboQnoZsG4q5WTP468SQvvG5\n" \
 "-----END CERTIFICATE-----\n";
 //////////////////////////////////////////////////////////////////////////////
-
+bool Internet_Connected = false;
 bool Send_trigger = false;
 bool state = HIGH;
 int send_response = 0;
 
 String web_sequence = "";   //"0:0:0:0:0:0:0:0:0:0:0:0:&"
-bool Unlock_doors_keep_food[] = {false,false,false,false,false,false,false,false,false,false,false,false};
-bool Unlock_doors_Collect_food[] = {false,false,false,false,false,false,false,false,false,false,false,false};
+bool Unlock_doors_keep_food[] = {false,false,false,false,false,false};
+bool Unlock_doors_Collect_food[] = {false,false,false,false,false,false};
 
-bool response_is_locked[] =  {true, true, true, true, true, true, true, true, true, true, true, true};
-bool response_is_Occupied[] = {false,false,false,false,false,false,false,false,false,false,false,false};
-bool response_temp_threshold[] = {false,false,false,false,false,false,false,false,false,false,false,false};
-bool update_boxes[] = {false,false,false,false,false,false,false,false,false,false,false, false};
-bool response_sent[] = {false,false,false,false,false,false,false,false,false,false,false, false};
+bool response_is_locked[] =  {true, true, true, true, true, true};
+bool response_is_Occupied[] = {false,false,false,false,false,false};
+bool response_temp_threshold[] = {false,false,false,false,false,false};
+bool update_boxes[] = {false,false,false,false,false,false};
+bool response_sent[] = {false,false,false,false,false,false};
 
 bool push_web_status = true;
 
-String locker_box_ids[] ={"641d369629dd881c34916f3e","641d369629dd881c34916f3f","641d369629dd881c34916f40","641d369629dd881c34916f41","641d369629dd881c34916f42","641d369629dd881c34916f43","641d369629dd881c34916f44","641d369629dd881c34916f45","641d369629dd881c34916f46","641d369629dd881c34916f47","641d369629dd881c34916f48","641d369629dd881c34916f49"};
+String locker_box_ids[] ={"645e48416dd4d02438dea2c7","645e48416dd4d02438dea2c8","645e48416dd4d02438dea2c9","645e48416dd4d02438dea2ca","645e48416dd4d02438dea2cb","645e48416dd4d02438dea2cc"};
 
 // HardwareSerial Serial2(2) // use UART2
-
+//////////////////////////////////////////////////////////////////////////////
+//Function Decalration
+bool testWifi(void);
+void launchWeb(void);
+void setupAP(void);
 //////////////////////////////////////////////////////////////////////////////
 // Not sure if WiFiClientSecure checks the validity date of the certificate. 
 // Setting clock just to be sure...
@@ -108,30 +108,68 @@ void setClock() {
   Serial.print(asctime(&timeinfo));
 }
 //////////////////////////////////////////////////////////////////////////////
-WiFiMulti WiFiMulti;
-//////////////////////////////////////////////////////////////////////////////
+// WiFiMulti WiFiMulti;
 
+//Establishing Local server at port 80
+WebServer server(80);
+
+//////////////////////////////////////////////////////////////////////////////
 void setup(){
 	Serial.begin(9600);
 	Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
 	pinMode(LED, OUTPUT);
 	digitalWrite(LED, LOW);
-	
-	WiFi.mode(WIFI_STA);
-	WiFiMulti.addAP(ssid, password);
+	pinMode(Switch, INPUT_PULLUP);
 
-	while ((WiFiMulti.run() != WL_CONNECTED)) {
-	Serial.print(".");
-	}
-	// Serial.println(" connected");
+	Serial.println("Disconnecting current wifi connection");
+  WiFi.disconnect();
+  EEPROM.begin(512); //Initialasing EEPROM
+  delay(10);
+  //---------------------------------------- Read eeprom for ssid and pass
+  Serial.println("Reading EEPROM ssid");
 
-	// setClock();  
+  for (int i = 0; i < 32; ++i)
+  {
+    esid += char(EEPROM.read(i));
+  }
+  Serial.println();
+  Serial.print("SSID: ");
+  Serial.println(esid);
+  ////////////////////////////
+  Serial.println("Reading EEPROM pass");
 
-	Get_web_Status();
+  for (int i = 32; i < 96; ++i)
+  {
+    epass += char(EEPROM.read(i));
+  }
+  Serial.print("PASS: ");
+  Serial.println(epass);
+
+
+  WiFi.begin(esid.c_str(), epass.c_str());
+  delay(5000);
+  if ((WiFi.status() == WL_CONNECTED))
+  {
+  		digitalWrite(LED, HIGH);
+  		Internet_Connected = true;
+      // Serial.print("Connected to ");
+      // Serial.print(esid);
+      // Serial.println(" Successfully");
+      delay(2000);
+  }
+  else{
+  	Internet_Connected = false;
+  	digitalWrite(LED, LOW);
+    Serial.print("Issue with SSID and Password");
+  }
+
+	if(Internet_Connected) Get_web_Status();
 }
-
+//////////////////////////////////////////////////////////////////////////////
 void loop(){
-	if(push_web_status){
+	unsigned long last_Time;
+
+	if(push_web_status && Internet_Connected){
 		if(Serial2.available()){
 			char command = Serial2.read();
 			if((command == 'S') && !Send_trigger){
@@ -158,7 +196,7 @@ void loop(){
 	}
 	
 
-	if(Send_trigger){
+	if(Send_trigger && Internet_Connected){
 		delay(polling_time);
 		Get_web_Status();
 		if(send_response){  //Sending response to Master Controller
@@ -173,12 +211,7 @@ void loop(){
 					else if(i == 3) Serial2.println("D");
 					else if(i == 4) Serial2.println("E");
 					else if(i == 5) Serial2.println("F");
-					else if(i == 6) Serial2.println("G");
-					else if(i == 7) Serial2.println("H");
-					else if(i == 8) Serial2.println("I");
-					else if(i == 9) Serial2.println("J");
-					else if(i == 10) Serial2.println("K");
-					else if(i == 11) Serial2.println("L");
+
 				}
 				else if(Unlock_doors_Collect_food[i]){
 					// Serial.println("Collect Food >>>>>>>>>");
@@ -188,12 +221,6 @@ void loop(){
 					else if(i == 3) Serial2.println("d");
 					else if(i == 4) Serial2.println("e");
 					else if(i == 5) Serial2.println("f");
-					else if(i == 6) Serial2.println("g");
-					else if(i == 7) Serial2.println("h");
-					else if(i == 8) Serial2.println("i");
-					else if(i == 9) Serial2.println("j");
-					else if(i == 10) Serial2.println("k");
-					else if(i == 11) Serial2.println("l");
 				} 
 			}
 			///////////////////////////////////////////////////////////////////////
@@ -220,6 +247,51 @@ void loop(){
 			///////////////////////////////////////////////////////////////////////
 		}
 	}
+
+	if(!(testWifi() && (digitalRead(Switch) == 1))){
+    unsigned long int start_time = millis();
+    while(1){
+      if(millis() - start_time > 5000) {break;}
+      else{
+        if(digitalRead(Switch) == 1) {Internet_Connected = false;break;}    
+      }
+    }
+    if(digitalRead(Switch) == 0){
+      // Serial.println("Connection Status Negative / D15 HIGH");
+      Serial.println("Turning the HotSpot On");
+      digitalWrite(LED, LOW);
+      launchWeb();
+      setupAP();// Setup HotSpot
+      Serial.println();
+      Serial.println("Waiting.");
+      digitalWrite(LED, HIGH);
+
+      while ((WiFi.status() != WL_CONNECTED))
+      {
+        Serial.print(".");
+        delay(100);
+        server.handleClient();
+      }
+      delay(1000);
+    }else{
+    	for(int i=0; i<3; i++){
+    		digitalWrite(LED, state);
+				state =!state;
+				delay(100);
+				digitalWrite(LED, state);	
+				state =!state;
+    	}
+   		Internet_Connected = false;
+    }
+  }
+
+  if(!Internet_Connected){
+  	last_Time = millis();
+  	while(millis() - last_Time < 10000){
+  		if(testWifi()) {Internet_Connected = true;break;}
+  	}
+  	if(!Internet_Connected)  {Serial2.println("X");}
+  }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Get_web_Status(){
@@ -252,8 +324,8 @@ void Get_web_Status(){
 	  if (error) {
 	    return;
 	  }
-	  const char* id = doc["id"]; // "64xxxxxxxxxxxxxxxxxxxxx3"
-	  const char* name = doc["name"]; // "RCity"
+	  const char* id = doc["id"]; // "645xxxxxxxxxxxxxxxxxxxc6" 645e48406dd4d02438dea2c6
+	  const char* name = doc["name"]; // "rcity locker 1"
 
 	  for (JsonObject locker_boxe : doc["locker_boxes"].as<JsonArray>()) {
 
@@ -300,7 +372,7 @@ void SerializeJsonDoc( int i){
 	StaticJsonDocument<200> sensor;    //192
 	String sensor_json;
 
-	sensor["locker_id"] = "641d369629dd881c34916f3d"; 
+	sensor["locker_id"] = "645e48406dd4d02438dea2c6"; 
 	sensor["ip_address"] = box_ip;
 	sensor["locker_box_id"] = locker_box_ids[i];
 	JsonObject properties = sensor.createNestedObject("properties");
@@ -349,7 +421,7 @@ void SerializeJsonDoc( int i){
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void update_response(){
 	int index=0;
 	for(int i=0; i<box_count; i++){
@@ -364,3 +436,154 @@ void update_response(){
 	// }
 	// if(index == box_count) send_response = false;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Fuctions used for WiFi credentials saving and connecting to it which you do not need to change
+bool testWifi(void){
+  int c = 0;
+  //Serial.println("Waiting for Wifi to connect");
+  while ( c < 20 ) {
+    if (WiFi.status() == WL_CONNECTED)
+    {
+    	Internet_Connected = true;
+      return true;
+    }
+    delay(500);
+    Serial.print("*");
+    c++;
+  }
+  Serial.println("");
+  Serial.println("Connect timed out!!!!!");
+  return false;
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
+void launchWeb(){
+  Serial.println("");
+  if (WiFi.status() == WL_CONNECTED)
+    Serial.println("WiFi connected");
+  Serial.print("Local IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("SoftAP IP: ");
+  Serial.println(WiFi.softAPIP());
+  createWebServer();
+  // Start the server
+  server.begin();
+  Serial.println("Server started");
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
+void createWebServer(){
+  
+  server.on("/", []() {
+
+    IPAddress ip = WiFi.softAPIP();
+    String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
+    content = "<!DOCTYPE HTML>\r\n<html>Welcome to Wifi Credentials Update page";
+    content += "<form action=\"/scan\" method=\"POST\"><input type=\"submit\" value=\"scan\"></form>";
+    content += ipStr;
+    content += "<p>";
+    content += st;
+    content += "</p><form method='get' action='setting'><label>SSID: </label><input name='ssid' length=32><input name='pass' length=64><input type='submit'></form>";
+    content += "</html>";
+    server.send(200, "text/html", content);
+  });
+
+  server.on("/scan", []() {
+    //setupAP();
+    IPAddress ip = WiFi.softAPIP();
+    String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
+
+    content = "<!DOCTYPE HTML>\r\n<html>go back";
+    server.send(200, "text/html", content);
+  });
+
+  server.on("/setting", []() {
+    String qsid = server.arg("ssid");
+    String qpass = server.arg("pass");
+    if (qsid.length() > 0 && qpass.length() > 0) {
+      Serial.println("clearing eeprom");
+      for (int i = 0; i < 96; ++i) {
+        EEPROM.write(i, 0);
+      }
+      Serial.println(qsid);
+      Serial.println("");
+      Serial.println(qpass);
+      Serial.println("");
+
+      Serial.println("writing eeprom ssid:");
+      for (int i = 0; i < qsid.length(); ++i)
+      {
+        EEPROM.write(i, qsid[i]);
+        Serial.print("Wrote: ");
+        Serial.println(qsid[i]);
+      }
+      Serial.println("writing eeprom pass:");
+      for (int i = 0; i < qpass.length(); ++i)
+      {
+        EEPROM.write(32 + i, qpass[i]);
+        Serial.print("Wrote: ");
+        Serial.println(qpass[i]);
+      }
+      EEPROM.commit();
+
+      content = "{\"Success\":\"saved to eeprom... reset to boot into new wifi\"}";
+      statusCode = 200;
+      ESP.restart();
+    } else {
+      content = "{\"Error\":\"404 not found\"}";
+      statusCode = 404;
+      Serial.println("Sending 404");
+    }
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(statusCode, "application/json", content);
+
+  });
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
+void setupAP(void)
+{
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0)
+    Serial.println("no networks found");
+  else
+  {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i)
+    {
+      // Print SSID and RSSI for each network found
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.print(")");
+      //Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*");
+      delay(10);
+    }
+  }
+  Serial.println("");
+  st = "<ol>";
+  for (int i = 0; i < n; ++i)
+  {
+    // Print SSID and RSSI for each network found
+    st += "<li>";
+    st += WiFi.SSID(i);
+    st += " (";
+    st += WiFi.RSSI(i);
+
+    st += ")";
+    //st += (WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*";
+    st += "</li>";
+  }
+  st += "</ol>";
+  delay(100);
+  WiFi.softAP("Kiosk-645*2c6", "");
+  Serial.println("Initializing_softap_for_wifi credentials_modification");
+  launchWeb();
+  Serial.println("over");
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
