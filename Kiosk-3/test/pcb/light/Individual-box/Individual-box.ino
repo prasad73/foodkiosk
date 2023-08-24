@@ -11,7 +11,7 @@
 #define LED_PIN_4    51
 
 // How many NeoPixels are attached to the Arduino?
-#define LED_COUNT_1 45
+#define LED_COUNT_1 60
 
 // Declare our NeoPixel strip object:
 // Adafruit_NeoPixel strip1(LED_COUNT_1, LED_PIN_1, NEO_GRB + NEO_KHZ800);
@@ -30,7 +30,7 @@ Adafruit_NeoPixel strip4(LED_COUNT_1, LED_PIN_4, NEO_GRB + NEO_KHZ800);
 
 // setup() function -- runs once at startup --------------------------------
 
-int led_column[9][5]={{0,1,2,3,4},{5,6,7,8,9},{10,11,12,13,14},{15,16,17,18,19},{20,21,22,23,24},{25,26,27,28,29},{30,31,32,33,34},{35,36,37,38,39},{40,41,42,43,44}};
+int led_column[9][5]={{0,1,2,3,4},{5,6,7,8,9},{10,11,12,13,14},{15,16,17,18,19},{20,21,22,23,24},{25,26,27,28,29},{30,31,32,33,34},{35,36,37,38,39},{40,41,42,43,44},{45,46,47,48,49},{50,51,52,53,54},{55,56,57,58,59}};
 
 void setup() {
   // These lines are specifically to support the Adafruit Trinket 5V 16 MHz.
@@ -103,6 +103,18 @@ void loop() {
     else if(command == 'i'){ update_column1(0, 8);}
     else if(command == 'I'){ update_column1(1, 8);}
     else if(command == '9'){ update_column1(2, 8);}
+
+    else if(command == 'j'){ update_column1(0, 9);}
+    else if(command == 'J'){ update_column1(1, 9);}
+    else if(command == 'x'){ update_column1(2, 9);}
+
+    else if(command == 'k'){ update_column1(0, 10);}
+    else if(command == 'K'){ update_column1(1, 10);}
+    else if(command == 'y'){ update_column1(2, 10);}
+
+    else if(command == 'l'){ update_column1(0, 11);}
+    else if(command == 'L'){ update_column1(1, 11);}
+    else if(command == 'z'){ update_column1(2, 11);}
 
   }
   
