@@ -61,7 +61,7 @@ const char* rootCACertificate = \
 "rqXRfboQnoZsG4q5WTP468SQvvG5\n" \
 "-----END CERTIFICATE-----\n";
 //////////////////////////////////////////////////////////////////////////////
-bool Internet_Connected = false;
+bool Wifi_Connected = false;
 bool Send_trigger = false;
 bool state = HIGH;
 int send_response = 0;
@@ -77,6 +77,8 @@ bool update_boxes[] = {false,false,false,false,false,false};
 bool response_sent[] = {false,false,false,false,false,false};
 
 bool push_web_status = true;
+bool Internet_down = false;
+bool Internet_status_down = false;
 
 String locker_box_ids[] ={"645e48416dd4d02438dea2c7","645e48416dd4d02438dea2c8","645e48416dd4d02438dea2c9","645e48416dd4d02438dea2ca","645e48416dd4d02438dea2cb","645e48416dd4d02438dea2cc"};
 
@@ -151,25 +153,25 @@ void setup(){
   if ((WiFi.status() == WL_CONNECTED))
   {
   		digitalWrite(LED, HIGH);
-  		Internet_Connected = true;
+  		Wifi_Connected = true;
       // Serial.print("Connected to ");
       // Serial.print(esid);
       // Serial.println(" Successfully");
       delay(2000);
   }
   else{
-  	Internet_Connected = false;
+  	Wifi_Connected = false;
   	digitalWrite(LED, LOW);
     Serial.print("Issue with SSID and Password");
   }
 
-	if(Internet_Connected) Get_web_Status();
+	if(Wifi_Connected) Get_web_Status();
 }
 //////////////////////////////////////////////////////////////////////////////
 void loop(){
 	unsigned long last_Time;
 
-	if(push_web_status && Internet_Connected){
+	if(push_web_status && Wifi_Connected){
 		if(Serial2.available()){
 			char command = Serial2.read();
 			if((command == 'S') && !Send_trigger){
@@ -196,8 +198,9 @@ void loop(){
 	}
 	
 
-	if(Send_trigger && Internet_Connected){
+	if(Send_trigger && Wifi_Connected){
 		delay(polling_time);
+		digitalWrite(LED, HIGH);
 		Get_web_Status();
 		if(send_response){  //Sending response to Master Controller
 			// Serial.println("Sending Response to Master");
@@ -253,18 +256,19 @@ void loop(){
     while(1){
       if(millis() - start_time > 5000) {break;}
       else{
-        if(digitalRead(Switch) == 1) {Internet_Connected = false;break;}    
+        if(digitalRead(Switch) == 1) {Wifi_Connected = false;break;}    
       }
     }
     if(digitalRead(Switch) == 0){
       // Serial.println("Connection Status Negative / D15 HIGH");
       Serial.println("Turning the HotSpot On");
+      Serial2.println("X");	//Capital X   -->> Turn Off MAchine Light's
       digitalWrite(LED, LOW);
       launchWeb();
       setupAP();// Setup HotSpot
       Serial.println();
       Serial.println("Waiting.");
-      digitalWrite(LED, HIGH);
+      // digitalWrite(LED, HIGH);
 
       while ((WiFi.status() != WL_CONNECTED))
       {
@@ -275,22 +279,49 @@ void loop(){
       delay(1000);
     }else{
     	for(int i=0; i<3; i++){
+    		state =!state;
     		digitalWrite(LED, state);
-				state =!state;
 				delay(100);
-				digitalWrite(LED, state);	
 				state =!state;
+				digitalWrite(LED, state);	
+				delay(100);
     	}
-   		Internet_Connected = false;
+   		Wifi_Connected = false;
     }
   }
 
-  if(!Internet_Connected){
+  if(!Wifi_Connected || Internet_down){
   	last_Time = millis();
   	while(millis() - last_Time < 10000){
-  		if(testWifi()) {Internet_Connected = true;break;}
+  		if(testWifi()) {Wifi_Connected = true;break;}
   	}
-  	if(!Internet_Connected)  {Serial2.println("X");}
+  	if(!Wifi_Connected)  {
+  		if(!Internet_status_down){
+  			Serial2.flush();
+  			Serial2.println("X");	//Capital X   -->> Turn Off MAchine Light's
+  			Serial2.flush();
+  			Internet_status_down = true;
+  		}  		
+  	}
+  }
+  else{
+  	if(Internet_status_down){
+  		Serial2.flush();
+  		Serial2.println("x");	//Small X   --> Turn On Machine Lights
+  		Serial2.flush();
+  		Internet_status_down = false;
+  	}
+  }
+
+  if(!Wifi_Connected){
+  	for(int i=0; i<3; i++){
+    		state =!state;
+    		digitalWrite(LED, state);
+    		delay(100);
+    		state =!state;
+				digitalWrite(LED, state);	
+				delay(100);
+    }
   }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -311,7 +342,12 @@ void Get_web_Status(){
 	    if (httpCode > 0) {
 	      if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
 	        line = https.getString();
+	        Internet_down = false;
 	      }
+	    }
+	    else{
+	    	Serial.println("Internet_down");
+	    	Internet_down = true;
 	    } 
 	    https.end();
 	  }
@@ -444,7 +480,7 @@ bool testWifi(void){
   while ( c < 20 ) {
     if (WiFi.status() == WL_CONNECTED)
     {
-    	Internet_Connected = true;
+    	Wifi_Connected = true;
       return true;
     }
     delay(500);
@@ -538,8 +574,7 @@ void createWebServer(){
   });
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
-void setupAP(void)
-{
+void setupAP(void){
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);

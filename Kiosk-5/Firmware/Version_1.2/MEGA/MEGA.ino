@@ -156,8 +156,8 @@ void loop(){
 	///////////////////////////////////////////////////////////////////////////////////
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	/////////////////////////Process serial command here///////////////////////////////
-	if(Serial.available()){
-		char command = Serial.read();
+	if(Serial3.available()){
+		char command = Serial3.read();
 		
 		// LED Status update command
 		// update_column4(0, 0);update_column4(1, 0);update_column4(0, 1);update_column4(1, 1);update_column4(0, 2);update_column4(1, 2);
@@ -383,13 +383,16 @@ void loop(){
 			door_lock_state[5] = true; 
 			//////////////////////////
 		}
-		else if(command == 'X'){
-		for(int i=0; i<strip4.numPixels(); i++) { // For each pixel in strip...
-		    strip4.setPixelColor(i, 0);         //  Set pixel's color (in RAM)
-		    strip4.show();                          //  Update strip to match
-		    delay(1);                           //  Pause for a moment
-		 }
-		Internet_Connected = false;
+		else if(command == 'X'){ 	//Capital X    <<<<<- Turn off Complete strip
+			for(int i=0; i<strip4.numPixels(); i++) { // For each pixel in strip...
+			    strip4.setPixelColor(i, 0);          //  Set pixel's color (in RAM)
+			    strip4.show();                       //  Update strip to match
+			    delay(1);                            //  Pause for a moment
+			 }
+			Internet_Connected = false;
+		}
+		else if(command == 'x'){ 	//Small x
+			Internet_Connected = true;
 		}
 		command = '#';
 	}
@@ -569,11 +572,11 @@ void update_Web_Status(){
       // Serial.println("S trigger sent");
       // Serial.flush();
       Serial3.flush();
-      if(Serial.available()){ //Example String_data="1:1:0:0:1:0:1:1:0:0:0:0:&";
+      if(Serial3.available()){ //Example String_data="1:1:0:0:1:0:1:1:0:0:0:0:&";
         char input[INPUT_SIZE];
 
         // size_t size = Serial3.readBytesUntil('&', input, INPUT_SIZE);
-        String data = Serial.readStringUntil('&');
+        String data = Serial3.readStringUntil('&');
         // Serial.print("data_recieved = ");
         // Serial.println(data);
 
