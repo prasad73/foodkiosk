@@ -110,16 +110,16 @@ void setup(){
 	//Ultrasonic Sensor Initialization/////////////////////////////////////////////////
 	pinMode(MUX_DATA, INPUT);
 	pinMode(EN, OUTPUT);
-  	pinMode(S0, OUTPUT);
-  	pinMode(S1, OUTPUT);
-  	pinMode(S2, OUTPUT);
-  	pinMode(S3, OUTPUT);
+	pinMode(S0, OUTPUT);
+	pinMode(S1, OUTPUT);
+	pinMode(S2, OUTPUT);
+	pinMode(S3, OUTPUT);
 
-  	digitalWrite(EN , LOW);
-  	digitalWrite(S0 , LOW);
-  	digitalWrite(S1 , LOW);
-  	digitalWrite(S2 , LOW);
-  	digitalWrite(S3 , LOW);
+	digitalWrite(EN , LOW);
+	digitalWrite(S0 , LOW);
+	digitalWrite(S1 , LOW);
+	digitalWrite(S2 , LOW);
+	digitalWrite(S3 , LOW);
 
   ///////////////////////////////////////////////////////////////////////////////////
 	//WS2812 LED Initialization////////////////////////////////////////////////////////

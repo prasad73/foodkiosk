@@ -28,9 +28,14 @@
 #define STAPSK  "Rapidcode12"
 #endif*/
 
+// #ifndef STASSID
+// #define STASSID "Nokia C01 Plus"
+// #define STAPSK  "versicles123"
+// #endif
+
 #ifndef STASSID
-#define STASSID "Nokia C01 Plus"
-#define STAPSK  "versicles123"
+#define STASSID "Versiclesjiofi"
+#define STAPSK  "Versicles@123"
 #endif
 
 #define get_link "https://locker-api.versicles.com/locker/6418065f4fbb671f149c0823.json"  //Update this link for different lockers

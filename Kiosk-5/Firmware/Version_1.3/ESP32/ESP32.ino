@@ -197,7 +197,6 @@ void loop(){
 		}	
 	}
 	
-
 	if(Send_trigger && Wifi_Connected){
 		delay(polling_time);
 		digitalWrite(LED, HIGH);
@@ -295,13 +294,22 @@ void loop(){
   	while(millis() - last_Time < 10000){
   		if(testWifi()) {Wifi_Connected = true;break;}
   	}
-  	if(!Wifi_Connected)  {
+  	if(Wifi_Connected && Internet_down)  {
   		if(!Internet_status_down){
   			Serial2.flush();
   			Serial2.println("X");	//Capital X   -->> Turn Off MAchine Light's
   			Serial2.flush();
   			Internet_status_down = true;
   		}  		
+  	}else {
+  		if(!Wifi_Connected)  {
+	  		if(!Internet_status_down){
+	  			Serial2.flush();
+	  			Serial2.println("X");	//Capital X   -->> Turn Off MAchine Light's
+	  			Serial2.flush();
+	  			Internet_status_down = true;
+  			}
+  		}
   	}
   }
   else{
@@ -313,7 +321,7 @@ void loop(){
   	}
   }
 
-  if(!Wifi_Connected){
+  if(!Wifi_Connected || Internet_down){
   	for(int i=0; i<3; i++){
     		state =!state;
     		digitalWrite(LED, state);
@@ -512,16 +520,32 @@ void createWebServer(){
 
     IPAddress ip = WiFi.softAPIP();
     String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-    content = "<!DOCTYPE HTML>\r\n<html>Welcome to Wifi Credentials Update page";
-    content += "<form action=\"/scan\" method=\"POST\"><input type=\"submit\" value=\"scan\"></form>";
+    content =  "<!DOCTYPE HTML>\r\n<html>";
+   
+    content += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+    content += "<title>Vendngo Kiosk</title>";
+    // content += "<link rel=\"icon\" href=\"data:,\">";
+    // content += "<style> body {font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center; background: #882C88; background-image: url(\"background.jpg\"); background-size: cover; background-repeat: no-repeat; background-position: center; }";
+    content += "<style> body {font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center; background: #882C88;}";
+    content += "</style></head>";
+    //content += "<form action=\"/scan\" method=\"POST\"><input type=\"submit\" value=\"scan\"></form>";
+    
+    content += "<body><div>";
+    content += "<p style=\"color: white\"; \"font-family: Arial, sans-serif\"; \"font-size: 1.5em\"; >Kiosk Wifi Configuration</h1></div>";
+    content += "<hr><p style=\"color: white\";>Device IP: </p><p style=\"color: white\";>";
     content += ipStr;
-    content += "<p>";
+    content += "</p><hr><p style=\"color: white\";><br>Scanned Networks<br><br></p><hr><p style=\"color: white\";>";
     content += st;
-    content += "</p><form method='get' action='setting'><label>SSID: </label><input name='ssid' length=32><input name='pass' length=64><input type='submit'></form>";
-    content += "</html>";
+    content += "</p><hr><form method='get' action='setting'>";
+    content += "<div><label>SSID: </label><input name='ssid' length=32></div>";
+    content += "<div><label>PASS: </label><input name='pass' length=64></div>";
+    content += "<hr><br><br><div><input type='submit'></div></form>";
+    content += "</body></html>";
+
     server.send(200, "text/html", content);
   });
 
+  /*
   server.on("/scan", []() {
     //setupAP();
     IPAddress ip = WiFi.softAPIP();
@@ -529,7 +553,7 @@ void createWebServer(){
 
     content = "<!DOCTYPE HTML>\r\n<html>go back";
     server.send(200, "text/html", content);
-  });
+  });*/
 
   server.on("/setting", []() {
     String qsid = server.arg("ssid");
@@ -560,16 +584,28 @@ void createWebServer(){
       }
       EEPROM.commit();
 
-      content = "{\"Success\":\"saved to eeprom... reset to boot into new wifi\"}";
+      content =  "<!DOCTYPE HTML>\r\n<html>";
+
+      content += "<head><meta name=\"viewport1\" content=\"width=device-width, initial-scale=1\">";
+	    content += "<style> body {font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center; background: #882C88; }";
+	    content += "</style></head>";
+			
+	    content += "<h1 style=\"color: white\"; \"font-family: Arial, sans-serif\"; \"font-size: 2.5em\"; >Wi-Fi Credentials saved..<br>Successfully</h1>";
+	    content += "</p><hr><p style=\"color: white\";><br><br>Wifi will auto-disconnect in 5 seconds<br>Kindly Close this browser tab and<br>Turn off Kiosk for 1 Minute<br>before restarting Kiosk</p><hr>";
+	    content += "</body></html>";
+
       statusCode = 200;
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+    	server.send(statusCode, "text/html", content);
+      delay(5000);
       ESP.restart();
     } else {
       content = "{\"Error\":\"404 not found\"}";
       statusCode = 404;
       Serial.println("Sending 404");
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+    	server.send(statusCode, "application/json", content);
     }
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(statusCode, "application/json", content);
 
   });
 }
