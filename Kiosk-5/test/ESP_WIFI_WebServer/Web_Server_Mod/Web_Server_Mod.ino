@@ -2,8 +2,8 @@
 #include <WiFi.h>
 
 // Replace with your network credentials
-const char* ssid = "BSNL-FTTH-1908";
-const char* password = "vtk2361908";
+const char* ssid = "Airtel_kesa_1918";
+const char* password = "air52810";
 
 // Set web server port number to 80
 WiFiServer server(80);
