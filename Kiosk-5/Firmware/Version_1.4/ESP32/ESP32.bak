@@ -12,15 +12,16 @@
 #define TXD2 17
 #define box_count 6
 #define Wifi_Switch 23
-#define Manual_Switch 18
+#define Manual_Switch 22
 
-#define box_ip "192.148.678.555"
+#define box_ip "192.178.678.555"
 #define polling_time 2000
 
 #ifndef STASSID
-#define STASSID "Vendigo-5"
+#define STASSID "Vendigo-3"
 #define STAPSK  "versicles123"
 #endif
+
 
 #define get_link "https://locker-api.versicles.com/locker/645e48406dd4d02438dea2c6.json"  //Update this link for different lockers
 #define parse_check "{\"id\": \"645e48406dd4d02438dea2c6\""                               //update this json response for every locker
@@ -38,19 +39,11 @@ String esid;
 String epass = "";
 //Server2 variables
 String header;        // Variable to store the HTTP request
-
-// Auxiliar variables to store the current output state
-String State_1 = "off";
-String State_2 = "off";
-String State_3 = "off";
-String State_4 = "off";
-String State_5 = "off";
-String State_6 = "off";
-
 //////////////////////////////////////////////////////////////////////////////
 unsigned long currentTime = millis();
 unsigned long previousTime = 0; 
 const long timeoutTime = 2000;    //(example: 2000ms = 2s)
+
 //////////////////////////////////////////////////////////////////////////////
 const char* put_host = "https://locker-iot-api.versicles.com";
 const uint16_t port = 443;
@@ -97,8 +90,7 @@ bool Internet_down = false;
 bool Internet_status_down = false;
 bool load_wifi_config_page = true;
 bool Manual_Control_Server_Configured = false;
-bool manual_mode_active = false;
-//////////////////////////////////////////////////////////////////////////////
+
 String locker_box_ids[] ={"645e48416dd4d02438dea2c7","645e48416dd4d02438dea2c8","645e48416dd4d02438dea2c9","645e48416dd4d02438dea2ca","645e48416dd4d02438dea2cb","645e48416dd4d02438dea2cc"};
 
 // HardwareSerial Serial2(2) // use UART2
@@ -107,10 +99,6 @@ String locker_box_ids[] ={"645e48416dd4d02438dea2c7","645e48416dd4d02438dea2c8",
 bool testWifi(void);
 void launchWeb(void);
 void setupAP(void);
-void createWebServer(void);
-void setupAP2(void);
-void launchWebApp(void);
-void RunWebServer2(void);
 //////////////////////////////////////////////////////////////////////////////
 // Not sure if WiFiClientSecure checks the validity date of the certificate. 
 // Setting clock just to be sure...
@@ -135,19 +123,9 @@ void setClock() {
 //////////////////////////////////////////////////////////////////////////////
 // WiFiMulti WiFiMulti;
 
-// Set your Static IP address
-IPAddress local_IP(192, 168, 1, 254);
-// Set your Gateway IP address
-IPAddress gateway(192, 168, 1, 1);
-
-IPAddress subnet(255, 255, 0, 0);
-IPAddress primaryDNS(8, 8, 8, 8);   //optional
-IPAddress secondaryDNS(8, 8, 4, 4); //optional
-//////////////////////////////////////////////////////////////////////////////
 //Establishing Local server at port 80
 WebServer server(80);
-// Set web server2 port number to 80
-WiFiServer server2(80);
+
 //////////////////////////////////////////////////////////////////////////////
 void setup(){
 	Serial.begin(9600);
@@ -156,16 +134,11 @@ void setup(){
 	digitalWrite(LED, LOW);
 	pinMode(Wifi_Switch, INPUT_PULLUP);
 	pinMode(Manual_Switch, INPUT_PULLUP);
-	delay(5000);
+
 	Serial.println("Disconnecting current wifi connection");
   WiFi.disconnect();
-
-  if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
-    Serial.println("STA Failed to configure");
-  }
-
   EEPROM.begin(512); //Initialasing EEPROM
-  // delay(5000);
+  delay(10);
   //---------------------------------------- Read eeprom for ssid and pass
   Serial.println("Reading EEPROM ssid");
 
@@ -188,7 +161,7 @@ void setup(){
 
 
   WiFi.begin(esid.c_str(), epass.c_str());
-  delay(3000);
+  delay(5000);
   if ((WiFi.status() == WL_CONNECTED))
   {
   		digitalWrite(LED, HIGH);
@@ -201,20 +174,16 @@ void setup(){
   else{
   	Wifi_Connected = false;
   	digitalWrite(LED, LOW);
-    Serial.println("Issue with SSID and Password");
+    Serial.print("Issue with SSID and Password");
   }
 
 	if(Wifi_Connected) Get_web_Status();
-
-	/*if(!Wifi_Connected && (digitalRead(Manual_Switch) == 0)){
-		server2.begin();
-	}*/
 }
 //////////////////////////////////////////////////////////////////////////////
 void loop(){
 	unsigned long last_Time;
 
-	if(push_web_status && Wifi_Connected && (digitalRead(Manual_Switch) == 1)){
+	if(push_web_status && Wifi_Connected){
 		if(Serial2.available()){
 			char command = Serial2.read();
 			if((command == 'S') && !Send_trigger){
@@ -222,32 +191,6 @@ void loop(){
 				Serial2.flush();
 				delay(500);
 				Serial2.println(web_sequence);
-				delay(500);
-				Serial2.flush();
-				// Serial2.flush();
-				digitalWrite(LED, state);
-				state =!state;
-			}
-			else if(command == 's'){
-				// Serial.println("Command small 's' detected");
-				Send_trigger = true;
-				web_sequence = "";
-				push_web_status = false;
-				Serial2.flush();
-				digitalWrite(LED, HIGH);		
-				// Serial.println("Samll s trigger!!!!!!!");
-			}
-		}	
-	}
-
-	if(push_web_status && Wifi_Connected && (digitalRead(Manual_Switch) == 0)){
-		if(Serial2.available()){
-			char command = Serial2.read();
-			if((command == 'S') && !Send_trigger){
-				// Serial.println("Command S detected");
-				Serial2.flush();
-				delay(500);
-				Serial2.println("0:0:0:0:0:0:&");
 				delay(500);
 				Serial2.flush();
 				// Serial2.flush();
@@ -319,7 +262,7 @@ void loop(){
 		}
 	}
 
-	if(digitalRead(Wifi_Switch) == 0) {
+	if(!(testWifi() && (digitalRead(Wifi_Switch) == 1) )) {
     unsigned long int start_time = millis();
     while(1){
       if(millis() - start_time > 5000) {break;}
@@ -333,14 +276,13 @@ void loop(){
     }
     if((digitalRead(Wifi_Switch) == 0) && load_wifi_config_page){
       // Serial.println("Connection Status Negative / D15 HIGH");
-      manual_mode_active = false;
-      // Serial.println("Turning the HotSpot1 On");
+      Serial.println("Turning the HotSpot On");
       Serial2.println("X");	//Capital X   -->> Turn Off MAchine Light's
       digitalWrite(LED, LOW);
       launchWeb();
       setupAP();// Setup HotSpot
       Serial.println();
-      // Serial.println("Waiting.");
+      Serial.println("Waiting.");
       // digitalWrite(LED, HIGH);
 
       while ((WiFi.status() != WL_CONNECTED))
@@ -363,29 +305,26 @@ void loop(){
     }
   }
 
-  if(digitalRead(Manual_Switch) == 0){
+  if(!Wifi_Connected && (digitalRead(Manual_Switch) == 0)){
   	if(!Manual_Control_Server_Configured){
-  		// Serial.println("Turning the HotSpot2 On");
-	    // Serial2.println("X");	//Capital X   -->> Turn Off MAchine Light's
-	    testWifi();
+  		Serial.println("Turning the HotSpot On");
+	    Serial2.println("X");	//Capital X   -->> Turn Off MAchine Light's
 	    digitalWrite(LED, LOW);
-	    while(!Wifi_Connected){Serial.println(".");}
 	    launchWebApp(); // WebApp for Manual Control
-	    // setupAP2();     // Setup HotSpot 2
-	    load_wifi_config_page=false;	
+	    setupAP2();     // Setup HotSpot 2	
 	    Manual_Control_Server_Configured = true;
-	    manual_mode_active = true;
   	}
   	else{
-  		if(manual_mode_active)RunWebServer2();
+  		RunWebServer2();
   	}
   }
   else{
-  	if(Manual_Control_Server_Configured) {delay(5000);ESP.restart();}
-  	if(!manual_mode_active){load_wifi_config_page = true;testWifi();}
+  	load_wifi_config_page = true;
+  	if(digitalRead(Manual_Switch) == 1) {if(Manual_Control_Server_Configured) {delay(5000);ESP.restart();}}
+  	else Manual_Control_Server_Configured = false;
   }
 
-  if((!Wifi_Connected || Internet_down) && !manual_mode_active){
+  if(!Wifi_Connected || Internet_down){
   	last_Time = millis();
   	while(millis() - last_Time < 10000){
   		if(testWifi()) {Wifi_Connected = true;break;}
@@ -417,7 +356,7 @@ void loop(){
   	}
   }
 
-  if((!Wifi_Connected || Internet_down) && !manual_mode_active){
+  if(!Wifi_Connected || Internet_down){
   	for(int i=0; i<3; i++){
     		state =!state;
     		digitalWrite(LED, state);
@@ -432,12 +371,6 @@ void loop(){
 void Get_web_Status(){
 	int index=0;
 	WiFiClientSecure *client = new WiFiClientSecure;
-
-	if(digitalRead(Manual_Switch) == 0){
-		Internet_down = true;
-		return;
-	}
-
 	if(client) {
 	client -> setCACert(rootCACertificate);
 	HTTPClient https;
@@ -456,9 +389,8 @@ void Get_web_Status(){
 	      }
 	    }
 	    else{
-	    	// Serial.println("Internet_down");
+	    	Serial.println("Internet_down");
 	    	Internet_down = true;
-	    	if(Internet_down) return;
 	    } 
 	    https.end();
 	  }
@@ -590,18 +522,18 @@ void update_response(){
 bool testWifi(void){
   int c = 0;
   //Serial.println("Waiting for Wifi to connect");
-  while ( c < 10 ) {
+  while ( c < 20 ) {
     if (WiFi.status() == WL_CONNECTED)
     {
     	Wifi_Connected = true;
       return true;
     }
-    delay(250);
+    delay(500);
     Serial.print("*");
     c++;
   }
   Serial.println("");
-  Serial.println("Wifi timed out!!!!!");
+  Serial.println("Connect timed out!!!!!");
   return false;
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -720,7 +652,7 @@ void setupAP(void){                   //Create Hotspot for Wifi-Credentials Page
   WiFi.disconnect();
   delay(100);
   int n = WiFi.scanNetworks();
-  // Serial.println("scan done");
+  Serial.println("scan done");
   if (n == 0)
     Serial.println("no networks found");
   else
@@ -757,35 +689,34 @@ void setupAP(void){                   //Create Hotspot for Wifi-Credentials Page
   st += "</ol>";
   delay(100);
   WiFi.softAP("Kiosk-645*2c6", "");
-  // Serial.println("Initializing_softap_for_wifi credentials_modification");
+  Serial.println("Initializing_softap_for_wifi credentials_modification");
   launchWeb();
-  // Serial.println("over");
+  Serial.println("over");
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
 void setupAP2(void){                   //Create Hotspot for Manual Locker Management Page
 
   IPAddress IP = WiFi.softAPIP();
-	Serial.print("AP IP address: ");
-	Serial.println(IP);
+	// Serial.print("AP IP address: ");
+	// Serial.println(IP);
 	WiFi.softAP("Kiosk_ea2c6", "");
 	delay(1000);
-	Serial.println("Check for available Network......");
+	// Serial.println("Scan for available Network......");
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
 void RunWebServer2(){             //webserver for Manual Control
-  // server2.begin();
-  WiFiClient client = server2.available();   // Listen for incoming clients
+  WiFiClient client = server.available();   // Listen for incoming clients
 
   if (client) {                             // If a new client connects,
     currentTime = millis();
     previousTime = currentTime;
-    // Serial.println("New Client.");          // print a message out in the serial port
+    Serial.println("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected() && currentTime - previousTime <= timeoutTime) {  // loop while the client's connected
       currentTime = millis();
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
-        // Serial.write(c);                    // print it out the serial monitor
+        Serial.write(c);                    // print it out the serial monitor
         header += c;
         if (c == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
@@ -799,53 +730,63 @@ void RunWebServer2(){             //webserver for Manual Control
             client.println();
             
             // turns the GPIOs on and off
-            if (header.indexOf("GET /1/on") >= 0) {              
+            if (header.indexOf("GET /1/on") >= 0) {
+              Serial.println("1 open");
+              digitalWrite(output2, HIGH);
+              delay(250);
+              digitalWrite(output2, LOW);
               State_1 = "on";
-              // Serial.println("1 Open");
-              Serial2.println("A");
             } else if (header.indexOf("GET /1/off") >= 0) {
-              // Serial.println("1 off");
-              Serial2.println("a");
+              Serial.println("1 off");
               State_1 = "off";  
             } else if (header.indexOf("GET /2/on") >= 0) {
-              // Serial.println("2 Open");
-              Serial2.println("B");
+              Serial.println("2 Open");
+              digitalWrite(output2, HIGH);
+              delay(200);
+              digitalWrite(output2, LOW);
+              delay(200);
+              digitalWrite(output2, HIGH);
+              delay(200);
+              digitalWrite(output2, LOW);
               State_2 = "on";
             } else if (header.indexOf("GET /2/off") >= 0) {
-              // Serial.println("2 off");
-              Serial2.println("b");
+              Serial.println("2 off");
               State_2 = "off";  
             } else if (header.indexOf("GET /3/on") >= 0) {
-              // Serial.println("3 Open");
-              Serial2.println("C");
+              Serial.println("3 Open");
+              digitalWrite(output2, HIGH);
+              delay(1000);
+              digitalWrite(output2, LOW);
               State_3 = "on";
             } else if (header.indexOf("GET /3/off") >= 0) {
-              // Serial.println("3 off");
-              Serial2.println("c");
+              Serial.println("3 off");
               State_3 = "off";  
             } else if (header.indexOf("GET /4/on") >= 0) {
-              // Serial.println("4 Open");
-              Serial2.println("D");
+              Serial.println("4 Open");
+              digitalWrite(output2, HIGH);
+              delay(500);
+              digitalWrite(output2, LOW);
+              delay(500);
+              digitalWrite(output2, HIGH);
+              delay(500);
+              digitalWrite(output2, LOW);
               State_4 = "on";
             } else if (header.indexOf("GET /4/off") >= 0) {
-              // Serial.println("4 off");
-              Serial2.println("d");
+              Serial.println("4 off");
               State_4 = "off";  
             } else if (header.indexOf("GET /5/on") >= 0) {
-              // Serial.println("5 Open");
-              Serial2.println("E");
+              Serial.println("5 Open");
+              digitalWrite(output2, HIGH);
               State_5 = "on";
             } else if (header.indexOf("GET /5/off") >= 0) {
-              // Serial.println("5 off");
-              Serial2.println("e");
+              Serial.println("5 off");
               State_5 = "off";  
             } else if (header.indexOf("GET /6/on") >= 0) {
-              // Serial.println("6 Open");
-              Serial2.println("F");
+              Serial.println("6 Open");
+              digitalWrite(output2, LOW);
               State_6 = "on";
             } else if (header.indexOf("GET /6/off") >= 0) {
-              // Serial.println("6 off");
-              Serial2.println("f");
+              Serial.println("6 off");
               State_6 = "off";  
             }
             
@@ -876,48 +817,48 @@ void RunWebServer2(){             //webserver for Manual Control
             
             // client.println("<p> 1 - " + State_1 + "</p>");
             if (State_1=="off") {
-              client.println("<p><a href=\"/1/on\"><button class=\"button\">1. Keep Item</button></a></p>");
+              client.println("<p><a href=\"/1/on\"><button class=\"button\">1.  OPEN</button></a></p>");
             } else {
-              client.println("<p><a href=\"/1/off\"><button class=\"button button2\">1. Take Item</button></a></p>");
+              client.println("<p><a href=\"/1/off\"><button class=\"button button2\">1. RESET</button></a></p>");
             } 
                
              
             // client.println("<p> 2 - " + State_2 + "</p>");      
             if (State_2=="off") {
-              client.println("<p><a href=\"/2/on\"><button class=\"button\">2. Keep Item</button></a></p>");
+              client.println("<p><a href=\"/2/on\"><button class=\"button\">2.  OPEN</button></a></p>");
             } else {
-              client.println("<p><a href=\"/2/off\"><button class=\"button button2\">2. Take Item</button></a></p>");
+              client.println("<p><a href=\"/2/off\"><button class=\"button button2\">2. RESET</button></a></p>");
             }
 
             // client.println("<p> 3 - " + State_3 + "</p>");     
             if (State_3=="off") {
-              client.println("<p><a href=\"/3/on\"><button class=\"button\">3. Keep Item</button></a></p>");
+              client.println("<p><a href=\"/3/on\"><button class=\"button\">3.  OPEN</button></a></p>");
             } else {
-              client.println("<p><a href=\"/3/off\"><button class=\"button button2\">3. Take Item</button></a></p>");
+              client.println("<p><a href=\"/3/off\"><button class=\"button button2\">3. RESET</button></a></p>");
             } 
                
              
             // client.println("<p> 4 - " + State_4 + "</p>");     
             if (State_4=="off") {
-              client.println("<p><a href=\"/4/on\"><button class=\"button\">4. Keep Item</button></a></p>");
+              client.println("<p><a href=\"/4/on\"><button class=\"button\">4.  OPEN</button></a></p>");
             } else {
-              client.println("<p><a href=\"/4/off\"><button class=\"button button2\">4. Take Item</button></a></p>");
+              client.println("<p><a href=\"/4/off\"><button class=\"button button2\">4. RESET</button></a></p>");
             }
 
 
             // client.println("<p> 5 - " + State_5 + "</p>");      
             if (State_5=="off") {
-              client.println("<p><a href=\"/5/on\"><button class=\"button\">5. Keep Item</button></a></p>");
+              client.println("<p><a href=\"/5/on\"><button class=\"button\">5.  OPEN</button></a></p>");
             } else {
-              client.println("<p><a href=\"/5/off\"><button class=\"button button2\">5. Take Item</button></a></p>");
+              client.println("<p><a href=\"/5/off\"><button class=\"button button2\">5. RESET</button></a></p>");
             } 
                
              
             // client.println("<p> 6 - " + State_6 + "</p>");      
             if (State_6=="off") {
-              client.println("<p><a href=\"/6/on\"><button class=\"button\">6. Keep Item</button></a></p>");
+              client.println("<p><a href=\"/6/on\"><button class=\"button\">6.  OPEN</button></a></p>");
             } else {
-              client.println("<p><a href=\"/6/off\"><button class=\"button button2\">6. Take Item</button></a></p>");
+              client.println("<p><a href=\"/6/off\"><button class=\"button button2\">6. RESET</button></a></p>");
             }
 
 
@@ -939,20 +880,19 @@ void RunWebServer2(){             //webserver for Manual Control
     header = "";
     // Close the connection
     client.stop();
-    // Serial.println("Client disconnected.");
-    // Serial.println("");
+    Serial.println("Client disconnected.");
+    Serial.println("");
   }
-  // server2.close();
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
 void launchWebApp(){                  //Launch Server for Locker Management Page
-  // Serial.println("");
-  // if (WiFi.status() == WL_CONNECTED)
-  //   Serial.println("WiFi connected");
+  Serial.println("");
+  if (WiFi.status() == WL_CONNECTED)
+    Serial.println("WiFi connected");
   // RunWebServer2();
   // Start the server
-  server2.begin();
-  Serial.println("Server2 started");
+  server.begin();
+  Serial.println("Server started");
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
